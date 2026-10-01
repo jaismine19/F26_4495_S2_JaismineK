@@ -49,9 +49,11 @@ pip install pandas numpy matplotlib scikit-learn streamlit plotly folium geopand
 
 - VPD crime dataset downloaded (all neighbourhoods, all years: 927,794 rows)
 - Initial data quality inspection (see `data/processed/data_quality_summary.txt`)
+- Data cleaning pipeline: 927,794 -> 893,267 rows (see `data/processed/cleaning_log.txt`)
 - Dataset documentation drafted (`docs/research/dataset_documentation.md`)
 - Cybersecurity threat model draft v0.1 (`docs/security/threat_model.md`)
-- Reproducible download + inspection scripts (`scripts/`)
+- Privacy review & data protection requirements (`docs/security/privacy_and_data_protection.md`)
+- Reproducible download, inspection, and cleaning scripts (`scripts/`)
 
 ### Key data quality findings
 
@@ -65,6 +67,7 @@ pip install pandas numpy matplotlib scikit-learn streamlit plotly folium geopand
 ```bash
 python scripts/00_download_data.py   # download + extract raw data
 python scripts/01_inspect_data.py    # generate quality summary
+python scripts/02_clean_data.py      # clean data + write cleaning log
 ```
 
 ## Disclaimer
