@@ -12,5 +12,3 @@
 | Sep 30, 2026 | 1.5 | Data cleaning: Wrote scripts/02_clean_data.py (dedupe, categorical standardization, zero-coordinate flagging, date/day-of-week/season features); cleaned dataset 927,794 to 893,267 rows with documented cleaning log |
 | Sep 30, 2026 | 1.5 | Privacy review: Drafted docs/security/privacy_and_data_protection.md v0.1 - data inventory, privacy principles, credential handling, location-data handling, implementation checklist |
 | Sep 30, 2026 | 0.5 | Repository maintenance: Updated README progress table and work log; committed and pushed all work to GitHub |
-| Oct 2, 2026 | 2 | App skeleton: Built Streamlit multipage structure (Home.py + 8 pages); implemented Overview page with live charts from cleaned data; set up st.navigation |
-| Oct 2, 2026 | 2 | Security skeleton: Implemented app/utils/auth.py (PBKDF2 password hashing, RBAC roles Admin/Analyst/Data Entry, demo user store); restricted Add Incident page behind login and role check; added Security page summarizing threat model and control status |

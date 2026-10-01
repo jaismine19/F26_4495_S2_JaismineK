@@ -34,16 +34,8 @@ F26_4495_S2_JaismineK/
 ## Setup
 
 ```bash
-pip install pandas numpy matplotlib streamlit plotly
+pip install pandas numpy matplotlib
 ```
-
-## Run the app
-
-```bash
-streamlit run app/Home.py
-```
-
-Opens in your browser at http://localhost:8501.
 
 ## Current Progress
 
@@ -62,8 +54,6 @@ Opens in your browser at http://localhost:8501.
 - Cybersecurity threat model draft v0.1 (`docs/security/threat_model.md`)
 - Privacy review & data protection requirements (`docs/security/privacy_and_data_protection.md`)
 - Reproducible download, inspection, and cleaning scripts (`scripts/`)
-- Streamlit app skeleton (`app/`): 8 pages with navigation, Overview with live
-  charts, RBAC login for Add Incident (demo users on Security page)
 
 ### Key data quality findings
 
