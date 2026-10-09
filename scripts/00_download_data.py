@@ -6,9 +6,12 @@ Run from the repository root:
 Downloads the zip for all neighbourhoods and all years, extracts it to
 data/raw/, and prints a brief description of the extracted files.
 """
+import ssl
 import urllib.request
 import zipfile
 from pathlib import Path
+
+import certifi
 
 URL = (
     "https://geodash.vpd.ca/opendata/crimedata_download/"
@@ -20,7 +23,10 @@ RAW_DIR = Path("data") / "raw"
 def download_zip(url: str, dest: Path) -> None:
     print(f"Downloading {url}")
     print("This may take a few minutes (file is ~10 MB compressed).")
-    with urllib.request.urlopen(url) as response:
+    # Use the certifi CA bundle: macOS python.org installs often lack the
+    # system trust store, which makes default SSL verification fail.
+    context = ssl.create_default_context(cafile=certifi.where())
+    with urllib.request.urlopen(url, context=context) as response:
         dest.write_bytes(response.read())
     print(f"Saved to {dest}")
 

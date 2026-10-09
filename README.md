@@ -34,7 +34,15 @@ F26_4495_S2_JaismineK/
 ## Setup
 
 ```bash
-pip install pandas numpy matplotlib
+python3 -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Run the app from the repository root:
+
+```bash
+streamlit run app/Home.py
 ```
 
 ## Current Progress
@@ -42,24 +50,40 @@ pip install pandas numpy matplotlib
 | Phase (per proposal) | Status |
 |---|---|
 | Sep 24-28: Proposal submitted | Complete |
-| Sep 29-Oct 6: Data acquisition | In progress |
-| Oct 7-12: Initial implementation | Not started |
+| Sep 29-Oct 6: Data acquisition | Complete |
+| Oct 7-12: Initial implementation | In progress |
+| Oct 13-20: Analytics & security | Not started |
+| Oct 21-28: Mid-course prototype | Not started |
+| Oct 29-Nov 9: Database & Add Incident | Not started |
 
 ### Completed so far
 
-- VPD crime dataset downloaded (all neighbourhoods, all years: 927,794 rows)
+- Reproducible Python environment (`requirements.txt`): pandas, numpy,
+  matplotlib, plotly, streamlit, pytest, certifi
+- VPD crime dataset downloaded (all neighbourhoods, all years: 928,362 rows
+  as of the Oct 4, 2026 source update)
 - Initial data quality inspection (see `data/processed/data_quality_summary.txt`)
-- Data cleaning pipeline: 927,794 -> 893,267 rows (see `data/processed/cleaning_log.txt`)
-- Dataset documentation drafted (`docs/research/dataset_documentation.md`)
+- Data cleaning pipeline: 928,362 -> 893,851 rows (see `data/processed/cleaning_log.txt`)
+- Dataset documentation (`docs/research/dataset_documentation.md`)
 - Cybersecurity threat model draft v0.1 (`docs/security/threat_model.md`)
 - Privacy review & data protection requirements (`docs/security/privacy_and_data_protection.md`)
 - Reproducible download, inspection, and cleaning scripts (`scripts/`)
+- Streamlit app skeleton: multipage navigation (Overview, Crime Map, Temporal
+  Analysis, Statistical Analysis, Machine Learning, Add Incident, Security,
+  Methodology), login/RBAC prototype (PBKDF2 hashing, demo users), Security
+  and Methodology pages (`app/`)
+- Temporal Analysis page implemented: filters plus hour-of-day, day-of-week,
+  month, season charts, year x month heatmap, and automatic insights
+  (`app/pages/3_temporal.py`)
+- Exploratory data analysis notebook (`notebooks/01_exploratory_analysis.ipynb`)
+- Functional test suite: 14 tests passing (`tests/test_pipeline.py`, run with
+  `pytest tests/ -v`)
 
 ### Key data quality findings
 
 - Missing year 2022 (2003-2021, 2023-2026)
-- 34,527 duplicate rows
-- 83,014 rows with zero coordinates
+- 34,511 duplicate rows
+- 83,020 rows with zero coordinates
 - 11 crime types, 24 neighbourhoods
 
 ## Reproduction

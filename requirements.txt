@@ -1,0 +1,9 @@
+# Vancouver Urban Safety Intelligence Platform - Python dependencies
+# Install with:  pip install -r requirements.txt
+pandas
+numpy
+matplotlib
+plotly
+streamlit
+pytest
+certifi

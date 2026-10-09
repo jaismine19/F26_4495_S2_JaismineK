@@ -9,13 +9,13 @@
 | Publisher | Vancouver Police Department (VPD), GeoDASH open data |
 | Download URL | `https://geodash.vpd.ca/opendata/crimedata_download/AllNeighbourhoods_AllYears/crimedata_csv_AllNeighbourhoods_AllYears.zip` |
 | Dataset file | `crimedata_csv_AllNeighbourhoods_AllYears.csv` |
-| Download date | September 30, 2026 |
+| Download date | October 8, 2026 (source file last modified by VPD: Oct 4, 2026) |
 | License/Disclaimer | See `legal_disclaimer.txt` in `data/raw/` |
 | Data dictionary | `VPD OpenData Crime Incidents Description.pdf` in `data/raw/` |
 
 ## 2. File Overview
 
-- **Rows:** 927,794
+- **Rows:** 928,362
 - **Columns:** 10
 - **Unit of analysis:** One reported, founded criminal incident.
 
@@ -39,10 +39,10 @@
 1. **Missing year 2022:** The dataset contains no records for 2022.
    - 2003-2021, then 2023-2026. This will be confirmed against the VPD website
      and documented in the final report.
-2. **Duplicate rows:** 34,527 exact duplicates were detected and will be removed
+2. **Duplicate rows:** 34,511 exact duplicates were detected and will be removed
    during cleaning.
-3. **Missing values:** HUNDRED_BLOCK (12), NEIGHBOURHOOD (100), X/Y (30).
-4. **Zero coordinates:** 83,014 rows have X = 0 and/or Y = 0. These are treated
+3. **Missing values:** HUNDRED_BLOCK (12), NEIGHBOURHOOD (99), X/Y (30).
+4. **Zero coordinates:** 83,020 rows have X = 0 and/or Y = 0. These are treated
    as missing coordinates and will be handled in geospatial analysis.
 5. **Coordinate range:** Valid-looking coordinates are consistent with UTM
    Zone 10N for the Vancouver area (X ~ 480,000-500,000; Y ~ 5,450,000-5,470,000).
@@ -58,12 +58,13 @@
 
 ## 6. Planned Transformations (to be implemented)
 
-- [ ] Remove duplicate records
-- [ ] Convert YEAR/MONTH/DAY into a single date field
-- [ ] Create derived features: season, day-of-week
-- [ ] Standardize categorical values (check whitespace/casing)
-- [ ] Handle rows with zero or missing X/Y
-- [ ] Document every transformation with row counts before/after
+- [x] Remove duplicate records (34,511 removed)
+- [x] Convert YEAR/MONTH/DAY into a single date field (INCIDENT_DATETIME)
+- [x] Create derived features: season, day-of-week
+- [x] Standardize categorical values (check whitespace/casing)
+- [x] Handle rows with zero or missing X/Y (flagged as missing, kept in dataset)
+- [x] Document every transformation with row counts before/after
+      (see `data/processed/cleaning_log.txt`; 928,362 -> 893,851 rows)
 
 ## 7. Reprocessing Instructions
 
