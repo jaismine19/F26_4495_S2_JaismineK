@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.1 - September 30, 2026
+**Status:** Draft v0.1 - October 9, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -135,4 +135,4 @@ Trust boundaries:
 
 | Date | Version | Author | Change |
 |---|---|---|---|
-| Sep 30, 2026 | 0.1 | Shashank Chaudhary | Initial draft from proposal threat matrix |
+| Oct 9, 2026 | 0.1 | Shashank Chaudhary | Initial draft from proposal threat matrix |

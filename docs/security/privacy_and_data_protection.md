@@ -1,7 +1,7 @@
 # Privacy Review & Data Protection Requirements
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.1 - September 30, 2026
+**Status:** Draft v0.1 - October 9, 2026
 **Related:** `docs/security/threat_model.md`
 
 ## 1. Data Inventory
@@ -94,4 +94,4 @@ The VPD dataset is public and designed to protect privacy:
 
 | Date | Version | Author | Change |
 |---|---|---|---|
-| Sep 30, 2026 | 0.1 | Shashank Chaudhary | Initial draft |
+| Oct 9, 2026 | 0.1 | Shashank Chaudhary | Initial draft |
