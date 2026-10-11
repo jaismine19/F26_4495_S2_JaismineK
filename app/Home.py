@@ -31,5 +31,4 @@ nav = st.navigation(pages)
 nav.run()
 
 with st.sidebar:
-    st.caption("CSIS 4495 - Research Prototype")
     st.caption("Not an official crime-reporting system.")
