@@ -76,6 +76,9 @@ streamlit run app/Home.py
   month, season charts, year x month heatmap, and automatic insights
   (`app/pages/3_temporal.py`)
 - Exploratory data analysis notebook (`notebooks/01_exploratory_analysis.ipynb`)
+- Temporal & pandemic analysis notebook (`notebooks/02_temporal_and_pandemic_analysis.ipynb`):
+  crime-type hour patterns, redacted-timestamp finding, COVID comparison,
+  seasonality and neighbourhood-change hypotheses
 - Functional test suite: 14 tests passing (`tests/test_pipeline.py`, run with
   `pytest tests/ -v`)
 
