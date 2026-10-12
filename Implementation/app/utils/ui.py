@@ -22,9 +22,9 @@ def require_data():
         st.warning(
             "Cleaned data not found. Run the pipeline first:\n\n"
             "```bash\n"
-            "python scripts/00_download_data.py\n"
-            "python scripts/01_inspect_data.py\n"
-            "python scripts/02_clean_data.py\n"
+            "python Implementation/scripts/00_download_data.py\n"
+            "python Implementation/scripts/01_inspect_data.py\n"
+            "python Implementation/scripts/02_clean_data.py\n"
             "```"
         )
         return None

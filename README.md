@@ -42,7 +42,7 @@ pip install -r requirements.txt
 Run the app from the repository root:
 
 ```bash
-streamlit run app/Home.py
+streamlit run Implementation/app/Home.py
 ```
 
 ## Current Progress
@@ -80,7 +80,7 @@ streamlit run app/Home.py
   crime-type hour patterns, redacted-timestamp finding, COVID comparison,
   seasonality and neighbourhood-change hypotheses
 - Functional test suite: 14 tests passing (`tests/test_pipeline.py`, run with
-  `pytest tests/ -v`)
+  `pytest Implementation/tests/ -v`)
 
 ### Key data quality findings
 
@@ -92,9 +92,9 @@ streamlit run app/Home.py
 ## Reproduction
 
 ```bash
-python scripts/00_download_data.py   # download + extract raw data
-python scripts/01_inspect_data.py    # generate quality summary
-python scripts/02_clean_data.py      # clean data + write cleaning log
+python Implementation/scripts/00_download_data.py   # download + extract raw data
+python Implementation/scripts/01_inspect_data.py    # generate quality summary
+python Implementation/scripts/02_clean_data.py      # clean data + write cleaning log
 ```
 
 ## Disclaimer

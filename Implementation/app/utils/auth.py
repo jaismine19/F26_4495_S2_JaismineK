@@ -10,7 +10,10 @@ Prototype implementation notes:
 """
 import hashlib
 import hmac
+import json
 import secrets
+import time
+from pathlib import Path
 
 ROLES = ["Administrator", "Analyst", "Data Entry"]
 
@@ -82,3 +85,73 @@ def has_permission(user: dict | None, permission: str) -> bool:
     if user is None:
         return False
     return permission in user.get("permissions", set())
+
+
+# ------------------------------------------------------------ audit logging
+# Prototype audit log: in-memory + optional file, append-only, timestamps in
+# UTC. The threat model plans a database-backed audit table in a later phase.
+
+AUDIT_LOG_PATH = Path(__file__).resolve().parents[3] / "data" / "audit_log.jsonl"
+
+AUDIT_EVENTS = ("login_success", "login_failure", "logout", "incident_added")
+
+
+def log_audit(user_id: str | None, event: str, detail: str = "") -> None:
+    """Append an audit entry (append-only)."""
+    if event not in AUDIT_EVENTS:
+        raise ValueError(f"Unknown audit event: {event}")
+    entry = {
+        "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "user_id": user_id,
+        "event": event,
+        "detail": detail,
+    }
+    AUDIT_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with AUDIT_LOG_PATH.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(entry) + "\n")
+
+
+def read_audit_log() -> list[dict]:
+    """Read all audit entries (newest last)."""
+    if not AUDIT_LOG_PATH.exists():
+        return []
+    entries = []
+    for line in AUDIT_LOG_PATH.read_text(encoding="utf-8").splitlines():
+        try:
+            entries.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return entries
+
+
+# ------------------------------------------------------ login attempt limits
+MAX_FAILED_ATTEMPTS = 5
+LOCKOUT_SECONDS = 60
+
+_attempts: dict[str, list[float]] = {}
+
+
+def record_failed_attempt(username: str) -> bool:
+    """Record a failed login for a username.
+
+    Returns True if the username is now locked out.
+    """
+    now = time.time()
+    key = username.strip().lower()
+    cutoff = now - LOCKOUT_SECONDS
+    _attempts[key] = [t for t in _attempts.get(key, []) if t > cutoff]
+    _attempts[key].append(now)
+    return len(_attempts[key]) >= MAX_FAILED_ATTEMPTS
+
+
+def is_locked_out(username: str) -> bool:
+    """True if the username has too many recent failed attempts."""
+    key = username.strip().lower()
+    cutoff = time.time() - LOCKOUT_SECONDS
+    recent = [t for t in _attempts.get(key, []) if t > cutoff]
+    return len(recent) >= MAX_FAILED_ATTEMPTS
+
+
+def reset_attempts(username: str) -> None:
+    """Clear failed-attempt history for a username (after a successful login)."""
+    _attempts.pop(username.strip().lower(), None)

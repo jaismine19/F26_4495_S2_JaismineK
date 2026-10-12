@@ -1,7 +1,7 @@
 """Functional tests for the data pipeline and app utilities.
 
 Run from the repository root:
-    pytest tests/ -v
+    pytest Implementation/tests/ -v
 
 The pipeline scripts live under scripts/ with numeric filenames, so they are
 loaded by path here rather than imported as modules.

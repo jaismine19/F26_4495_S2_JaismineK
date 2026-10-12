@@ -1,7 +1,7 @@
 """Data inspection and quality summary for VPD crime data.
 
 Run from the repository root:
-    python scripts/01_inspect_data.py
+    python Implementation/scripts/01_inspect_data.py
 
 Outputs a quality summary to data/processed/data_quality_summary.txt
 """

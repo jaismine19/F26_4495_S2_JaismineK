@@ -1,7 +1,7 @@
 """Clean the VPD crime dataset.
 
 Run from the repository root:
-    python scripts/02_clean_data.py
+    python Implementation/scripts/02_clean_data.py
 
 Steps (each logged with before/after row counts):
   1. Load raw CSV

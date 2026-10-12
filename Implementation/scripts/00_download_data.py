@@ -1,7 +1,7 @@
 """Download the VPD crime dataset from GeoDASH open data.
 
 Run from the repository root:
-    python scripts/00_download_data.py
+    python Implementation/scripts/00_download_data.py
 
 Downloads the zip for all neighbourhoods and all years, extracts it to
 data/raw/, and prints a brief description of the extracted files.

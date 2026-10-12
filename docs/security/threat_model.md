@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.1 - October 9, 2026
+**Status:** Draft v0.2 - October 11, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -103,20 +103,21 @@ Trust boundaries:
 | A09 Logging & Monitoring Failures | Partial | Audit logs for user actions |
 | A10 SSRF | Low | No server-side URL fetching planned |
 
-## 5. Planned Security Controls Summary
+## 5. Security Controls Summary
 
-| # | Control | Priority |
-|---|---|---|
-| 1 | Password hashing with bcrypt/argon2 | Critical |
-| 2 | RBAC: Administrator, Analyst, Data Entry | Critical |
-| 3 | Parameterized SQL queries | Critical |
-| 4 | Input validation/encoding (XSS prevention) | High |
-| 5 | Audit logging for user actions | High |
-| 6 | Session security (regenerate on login, secure config) | High |
-| 7 | Data minimization & coordinate generalization | Medium |
-| 8 | Dependency scanning (pip-audit) | Medium |
-| 9 | Secrets management (no keys in repo) | High |
-| 10 | Functional + security test checklist | Medium |
+| # | Control | Priority | Status (Oct 11) |
+|---|---|---|---|
+| 1 | Password hashing | Critical | Implemented - PBKDF2-HMAC-SHA256, 200k iterations, per-user salt (`app/utils/auth.py`); bcrypt/argon2 upgrade before any non-demo use |
+| 2 | RBAC: Administrator, Analyst, Data Entry | Critical | Implemented - roles + permission sets enforced on Add Incident page |
+| 3 | Parameterized SQL queries | Critical | Planned (with database phase) |
+| 4 | Input validation/encoding (XSS prevention) | High | Planned |
+| 5 | Audit logging for user actions | High | Implemented (prototype) - append-only JSONL audit log (`log_audit`/`read_audit_log`); DB-backed audit table planned |
+| 6 | Session security (regenerate on login, secure config) | High | Partial - Streamlit session state; hardening planned |
+| 7 | Login attempt limiting | High | Implemented (prototype) - 5 failures per 60s lockout (`record_failed_attempt`/`is_locked_out`) |
+| 8 | Data minimization & coordinate generalization | Medium | Documented in privacy review; map implementation later |
+| 9 | Dependency scanning (pip-audit) | Medium | Planned (testing phase) |
+| 10 | Secrets management (no keys in repo) | High | In place - `.gitignore`, no credentials committed |
+| 11 | Functional + security test checklist | Medium | In progress - 6 security unit tests added (`tests/test_security.py`) |
 
 ## 6. Security Testing Plan (for later phases)
 
@@ -136,3 +137,4 @@ Trust boundaries:
 | Date | Version | Author | Change |
 |---|---|---|---|
 | Oct 9, 2026 | 0.1 | Shashank Chaudhary | Initial draft from proposal threat matrix |
+| Oct 11, 2026 | 0.2 | Shashank Chaudhary | Control statuses updated for implemented auth/RBAC/audit/login-limiting; added login-attempt-limiting control; reflected prototype audit log design |

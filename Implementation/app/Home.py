@@ -1,7 +1,7 @@
 """Vancouver Urban Safety Intelligence Platform - main entry point.
 
 Run from the repository root:
-    streamlit run app/Home.py
+    streamlit run Implementation/app/Home.py
 """
 import sys
 from pathlib import Path

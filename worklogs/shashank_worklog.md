@@ -12,3 +12,7 @@
 | Oct 9, 2026 | 0.25 | Data cleaning: Wrote scripts/02_clean_data.py (dedupe, categorical standardization, zero-coordinate flagging, date/day-of-week/season features); cleaned dataset 927,794 to 893,267 rows with documented cleaning log |
 | Oct 9, 2026 | 0.25 | Privacy review: Drafted docs/security/privacy_and_data_protection.md v0.1 - data inventory, privacy principles, credential handling, location-data handling, implementation checklist |
 | Oct 9, 2026 | 0.25 | Repository maintenance: Updated README progress table and work log; committed and pushed all work to GitHub |
+| Oct 11, 2026 | 0.5 | Repo restructure: moved implementation code (app/, scripts/, notebooks/, tests/) under the Implementation/ folder per the progress report template; fixed all path references (README, docstrings, data loader); verified tests still pass |
+| Oct 11, 2026 | 1 | Security implementation: extended app/utils/auth.py with append-only audit logging (log_audit/read_audit_log, JSONL) and login attempt limiting (5 failures per 60s lockout); wrote tests/test_security.py (6 tests); full suite now 20 tests passing |
+| Oct 11, 2026 | 0.75 | Threat model v0.2: updated control statuses (PBKDF2 hashing, RBAC, audit log, login limiting now implemented); added revision entry; verified app serves after restructure |
+| Oct 11, 2026 | 0.25 | Verification and repo maintenance: ran full test suite and app smoke test after folder move; updated .gitignore for audit log file; committed and pushed |

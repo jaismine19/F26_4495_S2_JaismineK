@@ -69,6 +69,6 @@
 ## 7. Reprocessing Instructions
 
 ```bash
-python scripts/00_download_data.py   # downloads + extracts raw data
-python scripts/01_inspect_data.py    # generates quality summary
+python Implementation/scripts/00_download_data.py   # downloads + extracts raw data
+python Implementation/scripts/01_inspect_data.py    # generates quality summary
 ```

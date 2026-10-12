@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = Path(__file__).resolve().parents[3]
 CLEAN_PATH = REPO_ROOT / "data" / "processed" / "crime_data_cleaned.csv"
 
 
