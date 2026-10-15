@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.2 - October 11, 2026
+**Status:** Draft v0.3 - October 15, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -110,7 +110,7 @@ Trust boundaries:
 | 1 | Password hashing | Critical | Implemented - PBKDF2-HMAC-SHA256, 200k iterations, per-user salt (`app/utils/auth.py`); bcrypt/argon2 upgrade before any non-demo use |
 | 2 | RBAC: Administrator, Analyst, Data Entry | Critical | Implemented - roles + permission sets enforced on Add Incident page |
 | 3 | Parameterized SQL queries | Critical | Planned (with database phase) |
-| 4 | Input validation/encoding (XSS prevention) | High | Planned |
+| 4 | Input validation/encoding (XSS prevention) | High | Implemented (module) - allow-lists for crime type/neighbourhood, date range checks, HTML/script sanitization (`app/utils/validation.py`, 18 tests); awaiting form integration |
 | 5 | Audit logging for user actions | High | Implemented (prototype) - append-only JSONL audit log (`log_audit`/`read_audit_log`); DB-backed audit table planned |
 | 6 | Session security (regenerate on login, secure config) | High | Partial - Streamlit session state; hardening planned |
 | 7 | Login attempt limiting | High | Implemented (prototype) - 5 failures per 60s lockout (`record_failed_attempt`/`is_locked_out`) |
@@ -138,3 +138,4 @@ Trust boundaries:
 |---|---|---|---|
 | Oct 9, 2026 | 0.1 | Shashank Chaudhary | Initial draft from proposal threat matrix |
 | Oct 11, 2026 | 0.2 | Shashank Chaudhary | Control statuses updated for implemented auth/RBAC/audit/login-limiting; added login-attempt-limiting control; reflected prototype audit log design |
+| Oct 15, 2026 | 0.3 | Shashank Chaudhary | Input validation module added (allow-lists, date checks, XSS sanitization) with 18 tests; control status updated |
