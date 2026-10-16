@@ -96,7 +96,9 @@ def main() -> None:
     lines.extend(step_lines)
 
     CLEAN_PATH.parent.mkdir(parents=True, exist_ok=True)
-    cleaned.to_csv(CLEAN_PATH, index=False)
+    # ISO format keeps "00:00:00" on midnight rows; otherwise pandas writes
+    # date-only strings for them and read_csv cannot parse the mixed formats.
+    cleaned.to_csv(CLEAN_PATH, index=False, date_format="%Y-%m-%d %H:%M:%S")
     lines.append(f"Cleaned data saved to {CLEAN_PATH}")
 
     LOG_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")

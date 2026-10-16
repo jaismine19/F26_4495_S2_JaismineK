@@ -13,7 +13,10 @@ def load_crime_data() -> pd.DataFrame | None:
     """Load the cleaned crime dataset, or None if not yet generated."""
     if not CLEAN_PATH.exists():
         return None
-    df = pd.read_csv(CLEAN_PATH, parse_dates=["INCIDENT_DATETIME"])
+    df = pd.read_csv(CLEAN_PATH)
+    # Coerce defensively: older CSV exports wrote midnight timestamps without
+    # the time part, so parse_dates would leave the column as strings.
+    df["INCIDENT_DATETIME"] = pd.to_datetime(df["INCIDENT_DATETIME"], errors="coerce")
     return df
 
 
