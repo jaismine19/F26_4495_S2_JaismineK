@@ -24,3 +24,5 @@
 | Oct 11, 2026 | 1.0 | Read about EDA techniques and brainstormed approaches to reduce redundancy in the dataset |
 | Oct 12, 2026 | 1.0 | Reviewed and refined the analysis notebook structure, headings, and findings formatting |
 | Oct 12, 2026 | 0.5 | Prepared Progress Report #1: work-log table, summary, repo check-in, and AI-use section |
+| Oct 16, 2026 | 1.5 | Worked on the Statistical Analysis page: chi-square tests (crime type x season, crime type x day of week), reviewed observed/expected tables and the season-share heatmap |
+| Oct 16, 2026 | 3.0 | Debugged and fixed a datetime parsing bug: midnight timestamps were written without the time part, breaking INCIDENT_DATETIME loading; added ISO date format in the cleaning script and defensive parsing in the data loader |
