@@ -17,3 +17,5 @@
 | Oct 15, 2026 | 1.5 | Input validation module: wrote app/utils/validation.py for the incident-entry form - allow-lists for the 11 crime types and 24 neighbourhoods (taken from the real dataset), date range checks (no future dates, nothing before 2003), length limits, and HTML/script sanitization to prevent stored XSS |
 | Oct 15, 2026 | 1.5 | Validation testing: wrote tests/test_validation.py (18 tests covering sanitization, allow-lists, date rules, and full-record validation); ran the whole suite - 38 tests passing |
 | Oct 15, 2026 | 0.75 | Threat model v0.3: marked the input validation/XSS control as implemented with the new module; added revision entry; updated work log and pushed |
+| Oct 15, 2026 | 1.5 | Audit Log page: built app/pages/9_audit_log.py - administrator-only page showing the append-only audit log; registered it in the app navigation |
+| Oct 15, 2026 | 1 | Login hardening: wired audit logging and lockout enforcement into the Add Incident login flow (login_success/login_failure/logout events, 60s lockout after 5 failed attempts); verified app and tests |

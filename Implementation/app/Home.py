@@ -25,6 +25,7 @@ pages = [
     st.Page("pages/6_add_incident.py", title="Add Incident", icon=":material/note_add:"),
     st.Page("pages/7_security.py", title="Security", icon=":material/security:"),
     st.Page("pages/8_methodology.py", title="Methodology & Limitations", icon=":material/description:"),
+    st.Page("pages/9_audit_log.py", title="Audit Log (Admin)", icon=":material/description:"),
 ]
 
 nav = st.navigation(pages)
