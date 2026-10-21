@@ -37,7 +37,7 @@ for name, status, done in controls:
     icon = ":white_check_mark:" if done else ":construction:"
     st.markdown(f"{icon} **{name}** - {status}")
 
-st.markdown("### Demo credentials (classroom use only)")
+st.markdown("### Demo credentials")
 st.code(
     "admin  / demo_admin_123      (Administrator)\n"
     "analyst / demo_analyst_123   (Analyst)\n"
