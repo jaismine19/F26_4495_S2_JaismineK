@@ -30,6 +30,3 @@ pages = [
 
 nav = st.navigation(pages)
 nav.run()
-
-with st.sidebar:
-    st.caption("Not an official crime-reporting system.")
