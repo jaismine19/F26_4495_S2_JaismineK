@@ -44,7 +44,3 @@ st.code(
     "entry  / demo_entry_123      (Data Entry)",
     language="text",
 )
-st.warning(
-    "Demo passwords are for classroom demonstrations only and must not be "
-    "reused anywhere else."
-)
