@@ -64,6 +64,5 @@ if not has_permission(user, "add_incident"):
     st.stop()
 
 st.markdown("### New incident form")
-st.info("Form fields and database storage arrive in the Oct 29-Nov 9 phase.")
 st.text_input("Crime type", disabled=True)
 st.date_input("Incident date", disabled=True)

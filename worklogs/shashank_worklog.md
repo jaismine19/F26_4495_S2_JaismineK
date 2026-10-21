@@ -19,3 +19,4 @@
 | Oct 15, 2026 | 0.75 | Threat model v0.3: marked the input validation/XSS control as implemented with the new module; added revision entry; updated work log and pushed |
 | Oct 15, 2026 | 1.5 | Audit Log page: built app/pages/9_audit_log.py - administrator-only page showing the append-only audit log; registered it in the app navigation |
 | Oct 15, 2026 | 1 | Login hardening: wired audit logging and lockout enforcement into the Add Incident login flow (login_success/login_failure/logout events, 60s lockout after 5 failed attempts); verified app and tests |
+| Oct 15, 2026 | 0.5 | App polish: removed roadmap/phase-date notes from app pages (Crime Map, ML, Statistical, Add Incident) and updated the Security page control statuses to reflect implemented controls; installed scipy and re-verified the Statistical Analysis page |

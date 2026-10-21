@@ -2,15 +2,9 @@
 import streamlit as st
 
 
-def under_construction(feature: str, phase: str) -> None:
+def under_construction(feature: str) -> None:
     st.title(feature)
-    st.info(f"Under development - planned for the **{phase}** phase.")
-    st.markdown(
-        "See the proposal and repository for details:\n"
-        "- `docs/research/` - dataset and analysis documentation\n"
-        "- `docs/security/` - threat model and privacy review\n"
-        "- `README.md` - project progress table"
-    )
+    st.info("This page is still being built. Check back soon.")
 
 
 def require_data():

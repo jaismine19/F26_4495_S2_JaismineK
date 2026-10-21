@@ -88,8 +88,7 @@ def has_permission(user: dict | None, permission: str) -> bool:
 
 
 # ------------------------------------------------------------ audit logging
-# Prototype audit log: in-memory + optional file, append-only, timestamps in
-# UTC. The threat model plans a database-backed audit table in a later phase.
+# Append-only JSONL audit log with UTC timestamps.
 
 AUDIT_LOG_PATH = Path(__file__).resolve().parents[3] / "data" / "audit_log.jsonl"
 

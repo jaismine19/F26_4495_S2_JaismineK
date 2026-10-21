@@ -1,6 +1,5 @@
 """Temporal Analysis - patterns in crime by time of day, week, and season.
 
-Phase: Oct 7-12 (initial implementation)
 Owner: Jaismine Kaur (Data Analytics workstream)
 """
 import pandas as pd

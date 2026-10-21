@@ -1,6 +1,5 @@
 """Statistical Analysis - hypothesis tests and descriptive statistics.
 
-Phase: Oct 13-20 (analytics & security)
 Owner: Jaismine Kaur (Data Analytics workstream)
 
 Tests are computed with scipy (see app/utils/stats.py) and every test is

@@ -1,4 +1,4 @@
-"""Security page - summarizes the cybersecurity workstream (Shashank)."""
+"""Security page - summarizes the cybersecurity workstream."""
 import streamlit as st
 
 st.title("Security")
@@ -9,8 +9,8 @@ st.markdown(
 
 st.markdown("### Threat model status")
 st.markdown(
-    "- **Threat model v0.1** (`docs/security/threat_model.md`): assets, threat "
-    "actors, STRIDE analysis, OWASP Top 10 relevance, planned controls, and "
+    "- **Threat model v0.3** (`docs/security/threat_model.md`): assets, threat "
+    "actors, STRIDE analysis, OWASP Top 10 relevance, controls, and "
     "security testing plan."
 )
 st.markdown(
@@ -22,14 +22,15 @@ st.markdown(
 st.markdown("### Controls")
 
 controls = [
-    ("Password hashing (PBKDF2 prototype, bcrypt/argon2 planned)", "Implemented (skeleton)", True),
-    ("Role-based access control (Admin / Analyst / Data Entry)", "Implemented (skeleton)", True),
-    ("Add Incident restricted to authorized roles", "Implemented (skeleton)", True),
-    ("Parameterized SQL queries", "Planned (Oct 7-12, with database)", False),
-    ("Input validation & output encoding (XSS)", "Planned", False),
-    ("Audit logging", "Planned (with database)", False),
+    ("Password hashing (PBKDF2)", "Implemented", True),
+    ("Role-based access control (Admin / Analyst / Data Entry)", "Implemented", True),
+    ("Add Incident restricted to authorized roles", "Implemented", True),
+    ("Login attempt limiting (5 tries, 60s lockout)", "Implemented", True),
+    ("Audit logging (append-only)", "Implemented", True),
+    ("Input validation & output encoding (XSS)", "Implemented", True),
+    ("Parameterized SQL queries", "Planned", False),
     ("Session security hardening", "Planned", False),
-    ("Dependency scanning (pip-audit)", "Planned (testing phase)", False),
+    ("Dependency scanning (pip-audit)", "Planned", False),
 ]
 
 for name, status, done in controls:
