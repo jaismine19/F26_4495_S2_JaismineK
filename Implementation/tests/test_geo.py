@@ -80,3 +80,17 @@ class TestAggregateNeighbourhoods:
         assert west_end["lon"].iloc[0] == pytest.approx(expected_lon, abs=1e-9)
         # Count still includes all 4 rows (aggregation vs coordinate validity).
         assert west_end["incidents"].iloc[0] == 4
+
+    def test_all_invalid_coordinates_returns_empty_frame_with_columns(self):
+        """No valid coordinates anywhere must yield an empty frame, not a crash."""
+        df = pd.DataFrame(
+            {
+                "TYPE": ["Theft", "Mischief"],
+                "NEIGHBOURHOOD": ["West End", "Strathcona"],
+                "X": [0.0, 0.0],
+                "Y": [0.0, 0.0],
+            }
+        )
+        out = geo.aggregate_neighbourhoods(df)
+        assert len(out) == 0
+        assert list(out.columns) == ["neighbourhood", "incidents", "lat", "lon", "top_type"]

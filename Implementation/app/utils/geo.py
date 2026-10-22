@@ -93,4 +93,10 @@ def aggregate_neighbourhoods(df: pd.DataFrame) -> pd.DataFrame:
                 "top_type": group["TYPE"].mode().iloc[0],
             }
         )
+    # Return a correctly-shaped empty frame (not a bare DataFrame()) so
+    # callers can sort/downstream-process without KeyError surprises.
+    if not rows:
+        return pd.DataFrame(
+            columns=["neighbourhood", "incidents", "lat", "lon", "top_type"]
+        )
     return pd.DataFrame(rows).sort_values("incidents", ascending=False).reset_index(drop=True)
