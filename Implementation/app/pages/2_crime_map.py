@@ -90,6 +90,7 @@ hoods["color"] = hoods["cluster"].map(
     lambda c: CLUSTER_COLORS[int(c) % len(CLUSTER_COLORS)]
 )
 hoods["radius"] = np.sqrt(hoods["incidents"]) * 35
+hoods["incidents_fmt"] = hoods["incidents"].map(lambda v: f"{v:,}")
 
 st.caption(
     f"{len(hoods)} neighbourhoods, {len(view):,} incidents "
@@ -102,10 +103,9 @@ st.markdown("### Color legend - each archetype is one color")
 legend_cols = st.columns(n_clusters)
 for i, (c, info) in enumerate(clusters.items()):
     emoji = CLUSTER_EMOJI[int(c) % len(CLUSTER_EMOJI)]
-    signature = ", ".join(t.split(" (")[0] for t in info["top_types"])
     legend_cols[i].markdown(
         f"{emoji} **{info['name']}**  \n"
-        f"<small>{signature}</small>",
+        f"<small>{info['signature']}</small>",
         unsafe_allow_html=True,
     )
 
@@ -126,21 +126,34 @@ st.pydeck_chart(
     pdk.Deck(
         layers=[layer],
         initial_view_state=view_state,
+        map_style="light",
         tooltip={
             "html": (
-                "<b>{neighbourhood}</b><br/>"
-                "{incidents} incidents<br/>"
-                "Top type: {top_type}<br/>"
-                "Archetype: {archetype}"
+                "<div style='font-family:-apple-system, Segoe UI, Roboto, "
+                "sans-serif; padding:4px 8px; min-width:180px;'>"
+                "<b style='font-size:13px;'>{neighbourhood}</b><br/>"
+                "<span style='font-size:12px; color:#444444;'>{incidents_fmt} "
+                "incidents</span><br/>"
+                "<span style='font-size:12px; color:#444444;'>Top type: "
+                "{top_type}</span><br/>"
+                "<span style='font-size:12px; color:#1a1a1a;'>"
+                "<b>{archetype}</b></span>"
+                "</div>"
             ),
-            "style": {"backgroundColor": "steelblue", "color": "white"},
+            "style": {
+                "backgroundColor": "white",
+                "color": "#1a1a1a",
+                "borderRadius": "6px",
+                "boxShadow": "0 1px 6px rgba(0,0,0,0.25)",
+                "fontSize": "12px",
+            },
         },
     ),
     width="stretch",
 )
 st.caption(
     "How to read it: circle size = number of incidents. Hover any circle for "
-    "its neighbourhood, top crime type, and archetype. Colors match the "
+    "its neighbourhood, top crime type, and archetype group. Colors match the "
     "legend above."
 )
 
@@ -152,7 +165,7 @@ with st.expander("What is in each archetype?"):
             hoods.loc[hoods["cluster"] == c, "neighbourhood"].tolist()
         )
         st.markdown(
-            f"{emoji} **{info['name']}** "
+            f"{emoji} **{info['name']} - {info['signature']}** "
             f"({len(members)} neighbourhoods): "
             f"*{', '.join(members)}*"
         )

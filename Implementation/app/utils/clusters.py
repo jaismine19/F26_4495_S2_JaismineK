@@ -33,14 +33,15 @@ def cluster_neighbourhoods(mix: pd.DataFrame, k: int = 4) -> dict:
         cluster_info[i] = {
             "centroid": profile,
             "top_types": top,
-            "name": " + ".join(t.split(" (")[0].title() for t in top),
+            "name": f"Group {i + 1}",
+            "signature": " & ".join(t.split(" (")[0] for t in top),
         }
 
     labels_df = pd.DataFrame(
         {"neighbourhood": mix.index, "cluster": labels}
     )
     labels_df["archetype"] = labels_df["cluster"].map(
-        lambda c: cluster_info[c]["name"]
+        lambda c: f"{cluster_info[c]['name']} - {cluster_info[c]['signature']}"
     )
     return {"labels": labels_df, "clusters": cluster_info}
 
