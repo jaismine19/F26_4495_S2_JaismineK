@@ -166,7 +166,11 @@ selected_name = st.session_state.get("spotlight")
 m = folium.Map(
     location=[49.26, -123.12],
     zoom_start=11,
-    tiles="CartoDB positron",
+    tiles=(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/"
+        "World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+    ),
+    attr="Esri",
     control_scale=True,
 )
 
