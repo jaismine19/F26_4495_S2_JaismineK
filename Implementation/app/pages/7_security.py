@@ -28,7 +28,7 @@ controls = [
     ("Login attempt limiting (5 tries, 60s lockout)", "Implemented", True),
     ("Audit logging (append-only)", "Implemented", True),
     ("Input validation & output encoding (XSS)", "Implemented", True),
-    ("Parameterized SQL queries", "Planned", False),
+    ("Parameterized SQL queries (SQLite, user records only)", "Implemented", True),
     ("Session security hardening", "Planned", False),
     ("Dependency scanning (pip-audit)", "Planned", False),
 ]

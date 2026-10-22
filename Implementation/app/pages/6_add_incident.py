@@ -1,6 +1,15 @@
-"""Add Incident - restricted to authorized users (prototype)."""
+"""Add Incident - end-to-end secure incident entry (prototype).
+
+Login (RBAC + attempt limiting + audit) -> validated form (allow-lists, date
+checks, sanitization) -> parameterized SQLite insert -> user-entered records
+displayed separately from public VPD data. The audit trail itself is shown on
+the administrator-only Audit Log page.
+"""
+from datetime import date
+
 import streamlit as st
 
+from app.utils import db
 from app.utils.auth import (
     authenticate,
     has_permission,
@@ -9,11 +18,18 @@ from app.utils.auth import (
     record_failed_attempt,
     reset_attempts,
 )
+from app.utils.validation import (
+    ALLOWED_CRIME_TYPES,
+    ALLOWED_NEIGHBOURHOODS,
+    validate_incident_record,
+    validate_notes,
+)
 
 st.title("Add Incident")
 st.markdown(
-    "Prototype incident-entry feature. User-entered records are kept separate "
-    "from public historical data and stored with source/audit information."
+    "Prototype incident-entry feature. User-entered records are stored in a "
+    "separate database table with `source='user'` and audit information; they "
+    "are never mixed into the public VPD dataset."
 )
 
 if "user" not in st.session_state:
@@ -27,6 +43,7 @@ def do_logout() -> None:
     st.rerun()
 
 
+# ------------------------------------------------------------------- login
 if st.session_state.user is None:
     st.markdown("### Login")
     st.caption("Demo users: `admin` / `analyst` / `entry` (see Security page for demo passwords)")
@@ -54,6 +71,7 @@ if st.session_state.user is None:
                 st.rerun()
     st.stop()
 
+# -------------------------------------------------------------- logged in
 user = st.session_state.user
 st.success(f"Logged in as **{user['username']}** (role: {user['role']})")
 if st.button("Log out"):
@@ -63,6 +81,58 @@ if not has_permission(user, "add_incident"):
     st.error("Your role is not allowed to add incidents.")
     st.stop()
 
+# ------------------------------------------------------------------- form
 st.markdown("### New incident form")
-st.text_input("Crime type", disabled=True)
-st.date_input("Incident date", disabled=True)
+
+crime_type = st.selectbox(
+    "Crime type", sorted(ALLOWED_CRIME_TYPES), index=None,
+    placeholder="Select a crime type...",
+)
+incident_date = st.date_input(
+    "Incident date",
+    min_value=date(2003, 1, 1),
+    max_value=date.today(),
+)
+neighbourhood = st.selectbox(
+    "Neighbourhood", sorted(ALLOWED_NEIGHBOURHOODS), index=None,
+    placeholder="Select a neighbourhood...",
+)
+location = st.text_input(
+    "Location (hundred block or general area)", max_chars=100,
+)
+notes = st.text_area("Notes (optional)", max_chars=200)
+
+if st.button("Submit incident"):
+    record = {
+        "crime_type": crime_type or "",
+        "incident_date": incident_date,
+        "neighbourhood": neighbourhood or "",
+        "location": location or "",
+        "notes": notes or "",
+    }
+    is_valid, errors = validate_incident_record(record)
+    if not is_valid:
+        for field, message in errors.items():
+            st.error(f"{field}: {message}")
+    else:
+        record["notes"] = validate_notes(record["notes"])
+        new_id = db.insert_incident(record, user["username"])
+        log_audit(
+            user["username"],
+            "incident_added",
+            f"id={new_id} type={record['crime_type']}",
+        )
+        st.success(f"Incident saved (id {new_id}). It appears below, tagged "
+                   "`source='user'` and kept separate from VPD data.")
+
+# ------------------------------------------------- user-entered records list
+st.markdown("### Prototype entries (user-entered, separate from VPD data)")
+entries = db.fetch_incidents(limit=20)
+if not entries:
+    st.caption("No prototype entries yet. Submit the form above to create one.")
+else:
+    st.dataframe(entries, width="stretch", hide_index=True)
+    st.caption(
+        "These records are fictional/demo data. They are stored in a separate "
+        "table and are never shown in the public-data analytics pages."
+    )
