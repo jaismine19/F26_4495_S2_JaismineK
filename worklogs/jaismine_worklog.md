@@ -26,7 +26,8 @@
 | Oct 12, 2026 | 0.5 | Prepared Progress Report #1: work-log table, summary, repo check-in, and AI-use section |
 | Oct 16, 2026 | 1.5 | Worked on the Statistical Analysis page: chi-square tests (crime type x season, crime type x day of week), reviewed observed/expected tables and the season-share heatmap |
 | Oct 16, 2026 | 3.0 | Debugged and fixed a datetime parsing bug: midnight timestamps were written without the time part, breaking INCIDENT_DATETIME loading; added ISO date format in the cleaning script and defensive parsing in the data loader |
-| Oct 22, 2026 | 1.5 | Built the Add Incident end-to-end feature: SQLite database layer with parameterized queries (app/utils/db.py) and the validated incident form wired to the validation module, audit logging, and the user-entries display |
-| Oct 22, 2026 | 1.0 | Wrote database tests including SQL-injection safety checks (malicious input stored literally, table survives); suite now 51 passing tests |
-| Oct 22, 2026 | 0.5 | Resolved merge conflicts with Shashank's parallel security work (login lockout wiring, admin-only Audit Log page) and updated the Security page control statuses |
-| Oct 22, 2026 | 0.5 | Mid-course demo preparation: rehearsed the login/RBAC/audit flow end-to-end and wrote the demo cheat sheet |
+| Oct 22, 2026 | 1.0 | Went through the project to figure out which features could be built all the way through (from the screen to the database and back) for the mid-course demo - decided on the Add Incident feature |
+| Oct 22, 2026 | 1.5 | Built the Add Incident feature from front to back: set up the SQLite database with safe queries, connected the incident form to the validation rules, saved each record with who added it and when, and showed the saved entries in the app |
+| Oct 22, 2026 | 1.0 | Wrote tests for the database, including trying SQL injection attacks to check they are stored as plain text and cannot break anything; the test suite now has 51 passing tests |
+| Oct 22, 2026 | 0.5 | Fixed merge conflicts with Shashank's work (login lockout and the Audit Log page) and updated the Security page statuses |
+| Oct 22, 2026 | 0.5 | Practiced the demo flow (login, roles, audit trail) and made a cheat sheet for the presentation |
