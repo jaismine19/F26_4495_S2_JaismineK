@@ -31,6 +31,11 @@
 | Oct 22, 2026 | 1.0 | Wrote tests for the database, including trying SQL injection attacks to check they are stored as plain text and cannot break anything; the test suite now has 51 passing tests |
 | Oct 22, 2026 | 1.5 | Fixed merge conflicts with Shashank's work (login lockout and the Audit Log page) and updated the Security page statuses |
 | Oct 22, 2026 | 1.0 | Practiced the demo flow (login, roles, audit trail) and made a cheat sheet for the presentation |
+| Oct 22, 2026 | 1.0 | Tested the Crime Map from a first-time user's point of view and listed what felt unclear (color meaning, hover info, circle sizes) |
+| Oct 22, 2026 | 1.0 | Redesigned the map page for non-technical users: plain-English how-to guide, big-picture stats, auto-written neighbourhood summaries, and a full details table |
+| Oct 22, 2026 | 1.5 | Fixed the map interactivity: switched to a map engine with reliable hover tooltips and click-to-highlight selection |
+| Oct 22, 2026 | 0.5 | Fixed the broken map background (the old free map provider started requiring an API key) by switching to a free street-map provider |
+| Oct 22, 2026 | 1.0 | Fixed a crash that happened when filters left no usable map coordinates, and added a regression test; the test suite now has 62 passing tests |
 | Oct 23, 2026 | 1.0 | Started planning the neighbourhood map feature: decided to show neighbourhood-level data instead of raw points to keep it privacy-safe, and sketched how the page should work (filters -> grouped data -> map) |
 | Oct 23, 2026 | 1.5 | Worked on the coordinate conversion: turned the dataset's UTM coordinates into latitude and longitude using the standard map formulas, and checked the math against known Vancouver locations |
 | Oct 24, 2026 | 1.0 | Wrote the neighbourhood grouping logic: counts and median location per neighbourhood, with a check that skips coordinates outside Vancouver (data-quality guard) |
