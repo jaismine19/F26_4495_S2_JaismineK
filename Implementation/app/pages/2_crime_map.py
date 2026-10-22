@@ -112,6 +112,7 @@ for i, (c, info) in enumerate(clusters.items()):
 
 # ---------------------------------------------------------------------- map
 st.markdown("### Interactive map")
+
 base_layer = pdk.Layer(
     "ScatterplotLayer",
     data=hoods,
@@ -126,11 +127,46 @@ base_layer = pdk.Layer(
     radius_max_pixels=45,
 )
 
+def _extract_objects(result):
+    """Read clicked objects from a pydeck selection result, if any."""
+    if result is None:
+        return None
+    state = getattr(result, "selection", None)
+    if not state:
+        return None
+    # SelectionState is dict-like; access by key, not attribute.
+    return state.get("objects") if isinstance(state, dict) else getattr(state, "objects", None)
+
+
+# Draw the deck. If a neighbourhood was selected in a previous click, add a
+# highlight layer around it so the selection is visible on the map itself.
+selected_name = st.session_state.get("selected_hood")
+
+layers = [base_layer]
+if selected_name and selected_name in set(hoods["neighbourhood"]):
+    sel_df = hoods.loc[hoods["neighbourhood"] == selected_name].copy()
+    sel_df["radius"] = sel_df["radius"] * 1.8
+    layers.append(
+        pdk.Layer(
+            "ScatterplotLayer",
+            data=sel_df,
+            get_position=["lon", "lat"],
+            get_radius="radius",
+            get_fill_color=[255, 255, 255, 40],
+            get_line_color=[0, 0, 0, 255],
+            line_width_min_pixels=2,
+            stroked=True,
+            pickable=False,
+            radius_min_pixels=12,
+            radius_max_pixels=70,
+        )
+    )
+
 view_state = pdk.ViewState(latitude=49.26, longitude=-123.12, zoom=10.6)
 
 selection = st.pydeck_chart(
     pdk.Deck(
-        layers=[base_layer],
+        layers=layers,
         initial_view_state=view_state,
         map_style="light",
         tooltip={
@@ -155,12 +191,18 @@ selection = st.pydeck_chart(
     ),
     on_select="rerun",
     selection_mode="single-object",
+    key="crime_map_deck",
     width="stretch",
 )
 
-# Selected neighbourhood from the click event (None when nothing is selected).
-objects = getattr(getattr(selection, "selection", None), "objects", None)
-selected_name = objects[0].get("neighbourhood") if objects else None
+# A click arrives as the previous run's selection event: remember it, then
+# rerun once so the highlight layer above is drawn around the clicked circle.
+objects = _extract_objects(selection)
+if objects and isinstance(objects, list) and objects:
+    clicked = objects[0].get("neighbourhood")
+    if clicked and st.session_state.get("selected_hood") != clicked:
+        st.session_state["selected_hood"] = clicked
+        st.rerun()
 
 st.caption(
     "Hover for a quick summary - click a circle to highlight it and see its "
