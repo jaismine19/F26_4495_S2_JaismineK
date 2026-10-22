@@ -26,3 +26,7 @@
 | Oct 12, 2026 | 0.5 | Prepared Progress Report #1: work-log table, summary, repo check-in, and AI-use section |
 | Oct 16, 2026 | 1.5 | Worked on the Statistical Analysis page: chi-square tests (crime type x season, crime type x day of week), reviewed observed/expected tables and the season-share heatmap |
 | Oct 16, 2026 | 3.0 | Debugged and fixed a datetime parsing bug: midnight timestamps were written without the time part, breaking INCIDENT_DATETIME loading; added ISO date format in the cleaning script and defensive parsing in the data loader |
+| Oct 22, 2026 | 1.5 | Built the Add Incident end-to-end feature: SQLite database layer with parameterized queries (app/utils/db.py) and the validated incident form wired to the validation module, audit logging, and the user-entries display |
+| Oct 22, 2026 | 1.0 | Wrote database tests including SQL-injection safety checks (malicious input stored literally, table survives); suite now 51 passing tests |
+| Oct 22, 2026 | 0.5 | Resolved merge conflicts with Shashank's parallel security work (login lockout wiring, admin-only Audit Log page) and updated the Security page control statuses |
+| Oct 22, 2026 | 0.5 | Mid-course demo preparation: rehearsed the login/RBAC/audit flow end-to-end and wrote the demo cheat sheet |
