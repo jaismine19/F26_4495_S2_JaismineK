@@ -8,3 +8,5 @@ streamlit
 pytest
 certifi
 scipy
+folium
+streamlit-folium

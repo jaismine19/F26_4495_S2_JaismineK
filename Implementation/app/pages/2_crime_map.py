@@ -2,17 +2,20 @@
 
 Designed for anyone, not just analysts:
 - big-picture stats up top,
-- an interactive map where circles = neighbourhoods,
+- an interactive folium map where circles = neighbourhoods (native hover
+  tooltips + click-to-spotlight),
 - a "spotlight" with an automatically written summary of any neighbourhood,
 - and a full details table below.
 
 Pipeline: filter -> privacy-safe aggregation (median in-bounds coordinates
-per neighbourhood) -> k-means clustering of crime-type mixes -> pydeck map.
+per neighbourhood) -> k-means clustering of crime-type mixes -> folium map.
 """
 import numpy as np
 import pandas as pd
-import pydeck as pdk
 import streamlit as st
+
+import folium
+from streamlit_folium import st_folium
 
 from app.utils.clusters import cluster_neighbourhoods, crime_mix
 from app.utils.geo import aggregate_neighbourhoods
@@ -25,6 +28,7 @@ CLUSTER_COLORS = [
     [255, 127, 0, 180],    # orange
     [128, 0, 128, 180],    # purple
 ]
+CLUSTER_HEX = ["#e41a1c", "#377eb8", "#4daf4a", "#ff7f00", "#800080"]
 CLUSTER_EMOJI = ["🟥", "🟦", "🟩", "🟧", "🟪"]
 
 st.title("Crime Map")
@@ -124,11 +128,8 @@ with st.sidebar:
 
 # --------------------------------------------------------------- map prep
 max_incidents = float(hoods["incidents"].max())
-hoods["radius"] = (
-    60.0 + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 3000.0
-)
-hoods["color"] = hoods["cluster"].map(
-    lambda c: CLUSTER_COLORS[int(c) % len(CLUSTER_COLORS)]
+hoods["marker_radius"] = (
+    5.0 + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 15.0
 )
 hoods["incidents_fmt"] = hoods["incidents"].map(lambda v: f"{v:,}")
 hoods["rank"] = hoods["incidents"].rank(ascending=False, method="min").astype(int)
@@ -162,71 +163,62 @@ for i, (c, info) in enumerate(clusters.items()):
 # ---------------------------------------------------------------------- map
 selected_name = st.session_state.get("spotlight")
 
-base_layer = pdk.Layer(
-    "ScatterplotLayer",
-    data=hoods,
-    get_position=["lon", "lat"],
-    get_radius="radius",
-    get_fill_color="color",
-    get_line_color=[255, 255, 255, 200],
-    line_width_min_pixels=1,
-    stroked=True,
-    pickable=True,
-    radius_min_pixels=8,
-    radius_max_pixels=45,
+m = folium.Map(
+    location=[49.26, -123.12],
+    zoom_start=11,
+    tiles="CartoDB positron",
+    control_scale=True,
 )
 
-layers = [base_layer]
-if selected_name and selected_name in set(hoods["neighbourhood"]):
-    sel_df = hoods.loc[hoods["neighbourhood"] == selected_name].copy()
-    sel_df["radius"] = sel_df["radius"] * 1.8
-    layers.append(
-        pdk.Layer(
-            "ScatterplotLayer",
-            data=sel_df,
-            get_position=["lon", "lat"],
-            get_radius="radius",
-            get_fill_color=[255, 255, 255, 40],
-            get_line_color=[0, 0, 0, 255],
-            line_width_min_pixels=2,
-            stroked=True,
-            pickable=False,
-            radius_min_pixels=12,
-            radius_max_pixels=70,
-        )
-    )
-
-view_state = pdk.ViewState(latitude=49.26, longitude=-123.12, zoom=10.6)
-st.pydeck_chart(
-    pdk.Deck(
-        layers=layers,
-        initial_view_state=view_state,
-        map_style="light",
-        tooltip={
-            "html": (
-                "<div style='font-family:-apple-system, Segoe UI, Roboto, "
-                "sans-serif; padding:4px 8px; min-width:170px;'>"
-                "<b style='font-size:13px;'>{neighbourhood}</b><br/>"
-                "<span style='font-size:12px; color:#444444;'>{incidents_fmt} "
-                "incidents</span><br/>"
-                "<span style='font-size:12px; color:#1a1a1a;'>"
-                "<b>{archetype}</b></span>"
-                "</div>"
+for _, hood in hoods.iterrows():
+    color = CLUSTER_HEX[int(hood["cluster"]) % len(CLUSTER_HEX)]
+    is_selected = hood["neighbourhood"] == selected_name
+    folium.CircleMarker(
+        location=[hood["lat"], hood["lon"]],
+        radius=float(hood["marker_radius"] * (1.35 if is_selected else 1.0)),
+        color=color,
+        fill=True,
+        fill_color=color,
+        fill_opacity=0.75,
+        weight=3 if is_selected else 1.5,
+        tooltip=folium.Tooltip(
+            (
+                f"<b>{hood['neighbourhood']}</b><br>"
+                f"{hood['incidents_fmt']} incidents<br>"
+                f"{hood['archetype']}"
             ),
-            "style": {
-                "backgroundColor": "white",
-                "color": "#1a1a1a",
-                "borderRadius": "6px",
-                "boxShadow": "0 1px 6px rgba(0,0,0,0.25)",
-                "fontSize": "12px",
-            },
-        },
-    ),
-    width="stretch",
-)
+            sticky=True,
+        ),
+        popup=folium.Popup(
+            (
+                f"<b>{hood['neighbourhood']}</b><br>"
+                f"{hood['incidents_fmt']} incidents<br>"
+                f"Most common: {hood['top_type']}<br>"
+                f"{hood['archetype']}"
+            ),
+            max_width=260,
+        ),
+    ).add_to(m)
+
+map_result = st_folium(m, height=520, width="stretch", key="crime_map_folium")
+
+# A map click returns coordinates: match them to the nearest neighbourhood
+# and turn it into the spotlight pick.
+clicked = (map_result or {}).get("last_object_clicked") if isinstance(map_result, dict) else None
+if clicked and isinstance(clicked, dict):
+    clat, clng = clicked.get("lat"), clicked.get("lng")
+    if clat is not None and clng is not None:
+        hoods["dist"] = np.hypot(hoods["lat"] - clat, hoods["lon"] - clng)
+        best = hoods.loc[hoods["dist"].idxmin()]
+        if best["dist"] < 0.03:
+            if st.session_state.get("spotlight") != best["neighbourhood"]:
+                st.session_state["spotlight"] = best["neighbourhood"]
+                st.rerun()
+
 st.caption(
-    "Hover a circle for a quick summary. Pick a neighbourhood in the "
-    "Spotlight menu (left) to highlight it and read its full story below."
+    "Hover any circle for a quick summary, or click it. Pick a neighbourhood "
+    "in the Spotlight menu (left) to highlight it and read its full story "
+    "below."
 )
 
 # ------------------------------------------------------------- spotlight
