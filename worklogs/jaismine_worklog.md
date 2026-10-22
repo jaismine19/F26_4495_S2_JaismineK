@@ -29,5 +29,5 @@
 | Oct 22, 2026 | 1.0 | Went through the project to figure out which features could be built all the way through (from the screen to the database and back) for the mid-course demo - decided on the Add Incident feature |
 | Oct 22, 2026 | 1.5 | Built the Add Incident feature from front to back: set up the SQLite database with safe queries, connected the incident form to the validation rules, saved each record with who added it and when, and showed the saved entries in the app |
 | Oct 22, 2026 | 1.0 | Wrote tests for the database, including trying SQL injection attacks to check they are stored as plain text and cannot break anything; the test suite now has 51 passing tests |
-| Oct 22, 2026 | 0.5 | Fixed merge conflicts with Shashank's work (login lockout and the Audit Log page) and updated the Security page statuses |
-| Oct 22, 2026 | 0.5 | Practiced the demo flow (login, roles, audit trail) and made a cheat sheet for the presentation |
+| Oct 22, 2026 | 1.5 | Fixed merge conflicts with Shashank's work (login lockout and the Audit Log page) and updated the Security page statuses |
+| Oct 22, 2026 | 1.0 | Practiced the demo flow (login, roles, audit trail) and made a cheat sheet for the presentation |
