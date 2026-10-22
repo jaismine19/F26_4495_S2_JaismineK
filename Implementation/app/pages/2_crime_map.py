@@ -68,17 +68,17 @@ if len(hoods) < 2:
     st.stop()
 
 mix = crime_mix(view)
-n_clusters = min(k, len(mix))
 if len(mix) >= 2:
-    result = cluster_neighbourhoods(mix, k=n_clusters)
+    result = cluster_neighbourhoods(mix, k=k)
     hoods = hoods.merge(result["labels"], on="neighbourhood", how="left")
     clusters = result["clusters"]
 else:
     hoods["cluster"] = 0
-    hoods["archetype"] = "all"
-    clusters = {0: {"name": "all", "top_types": [], "signature": ""}}
+    hoods["archetype"] = "Group 1 - Mixed"
+    clusters = {0: {"name": "Group 1", "top_types": ["Mixed"], "signature": "Mixed"}}
 
 hoods = hoods.dropna(subset=["cluster"])
+n_clusters = len(clusters)
 if hoods.empty:
     st.warning("Not enough valid neighbourhood data in this filter.")
     st.stop()

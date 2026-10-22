@@ -53,6 +53,6 @@ else:
     df = pd.DataFrame(entries)
     st.dataframe(
         df[["timestamp_utc", "user_id", "event", "detail"]],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
