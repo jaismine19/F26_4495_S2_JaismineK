@@ -1,11 +1,13 @@
-"""Crime Map - neighbourhood intelligence (geospatial + ML).
+"""Crime Map - a plain-English explorer of Vancouver neighbourhood crime.
+
+Designed for anyone, not just analysts:
+- big-picture stats up top,
+- an interactive map where circles = neighbourhoods,
+- a "spotlight" with an automatically written summary of any neighbourhood,
+- and a full details table below.
 
 Pipeline: filter -> privacy-safe aggregation (median in-bounds coordinates
-per neighbourhood) -> k-means clustering of crime-type mixes -> interactive
-pydeck map colored by archetype.
-
-Interactivity: hover any circle for a quick tooltip, or click it to
-highlight it and see a full detail card (rank, top types, crime mix chart).
+per neighbourhood) -> k-means clustering of crime-type mixes -> pydeck map.
 """
 import numpy as np
 import pandas as pd
@@ -27,18 +29,33 @@ CLUSTER_EMOJI = ["🟥", "🟦", "🟩", "🟧", "🟪"]
 
 st.title("Crime Map")
 st.markdown(
-    "Each circle is one neighbourhood (median location, aggregated counts - "
-    "never raw incident points). Colors are **archetypes** found by k-means "
-    "clustering on each neighbourhood's crime mix."
+    "Explore reported crime across Vancouver's 24 neighbourhoods. Each "
+    "circle is one neighbourhood - **the bigger the circle, the more "
+    "incidents**. Colors group neighbourhoods whose **crime patterns look "
+    "similar**."
 )
+
+with st.expander("How to use this page (and what the words mean)"):
+    st.markdown(
+        "- **Incident** - one crime reported to and recorded by the Vancouver "
+        "Police Department.\n"
+        "- **Hover** any circle for a quick summary.\n"
+        "- **Spotlight menu** (left sidebar) - pick a neighbourhood to see "
+        "its full story below the map.\n"
+        "- **Color groups (archetypes)** - neighbourhoods are automatically "
+        "grouped by how similar their mix of crime types is. Same color = "
+        "similar pattern.\n"
+        "- This page shows neighbourhood-level summaries only - never exact "
+        "crime locations."
+    )
 
 df = require_data()
 if df is None:
     st.stop()
 
-# ------------------------------------------------------------ sidebar filters
+# ------------------------------------------------------------ sidebar controls
 with st.sidebar:
-    st.markdown("### Map filters")
+    st.markdown("### Filters")
     min_year, max_year = int(df["YEAR"].min()), int(df["YEAR"].max())
     year_range = st.slider(
         "Year range", min_value=min_year, max_value=max_year,
@@ -47,8 +64,8 @@ with st.sidebar:
     all_types = sorted(df["TYPE"].dropna().unique())
     selected_types = st.multiselect("Crime types", all_types, default=all_types)
     k = st.select_slider(
-        "Number of archetypes", options=[2, 3, 4, 5], value=4,
-        help="How many neighbourhood groups should k-means look for?",
+        "Number of color groups", options=[2, 3, 4, 5], value=4,
+        help="How many crime-pattern groups should the map show?",
     )
 
 mask = (
@@ -102,9 +119,10 @@ with st.sidebar:
         index=default_idx,
         key="spotlight_picker",
         on_change=_set_spotlight,
-        help="Highlight a neighbourhood on the map and see its full profile.",
+        help="Pick a neighbourhood to see its full profile below the map.",
     )
 
+# --------------------------------------------------------------- map prep
 max_incidents = float(hoods["incidents"].max())
 hoods["radius"] = (
     60.0 + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 3000.0
@@ -115,14 +133,23 @@ hoods["color"] = hoods["cluster"].map(
 hoods["incidents_fmt"] = hoods["incidents"].map(lambda v: f"{v:,}")
 hoods["rank"] = hoods["incidents"].rank(ascending=False, method="min").astype(int)
 
+# ------------------------------------------------------- big picture stats
+busiest = hoods.loc[hoods["incidents"].idxmax()]
+common_type = view["TYPE"].mode().iloc[0]
+
+st.markdown("### The big picture")
+c1, c2, c3, c4 = st.columns(4)
+c1.metric("Reported incidents", f"{len(view):,}")
+c2.metric("Neighbourhoods", len(hoods))
+c3.metric("Busiest neighbourhood", busiest["neighbourhood"])
+c4.metric("Most common type", common_type)
 st.caption(
-    f"{len(hoods)} neighbourhoods, {len(view):,} incidents "
-    f"({year_range[0]}-{year_range[1]}, {len(selected_types)} crime types), "
-    f"{n_clusters} archetypes."
+    f"Showing {year_range[0]}-{year_range[1]} with {len(selected_types)} "
+    f"crime types selected."
 )
 
-# -------------------------------------------------------------------- legend
-st.markdown("### Color legend - each archetype is one color")
+# ------------------------------------------------------------------- legend
+st.markdown("### What the colors mean")
 legend_cols = st.columns(n_clusters)
 for i, (c, info) in enumerate(clusters.items()):
     emoji = CLUSTER_EMOJI[int(c) % len(CLUSTER_EMOJI)]
@@ -133,7 +160,7 @@ for i, (c, info) in enumerate(clusters.items()):
     )
 
 # ---------------------------------------------------------------------- map
-st.markdown("### Interactive map")
+selected_name = st.session_state.get("spotlight")
 
 base_layer = pdk.Layer(
     "ScatterplotLayer",
@@ -148,9 +175,6 @@ base_layer = pdk.Layer(
     radius_min_pixels=8,
     radius_max_pixels=45,
 )
-
-# The picked neighbourhood drives the highlight layer and the profile card.
-selected_name = st.session_state.get("spotlight")
 
 layers = [base_layer]
 if selected_name and selected_name in set(hoods["neighbourhood"]):
@@ -173,7 +197,6 @@ if selected_name and selected_name in set(hoods["neighbourhood"]):
     )
 
 view_state = pdk.ViewState(latitude=49.26, longitude=-123.12, zoom=10.6)
-
 st.pydeck_chart(
     pdk.Deck(
         layers=layers,
@@ -201,31 +224,89 @@ st.pydeck_chart(
     ),
     width="stretch",
 )
-
 st.caption(
-    "Hover any circle for a quick summary. Pick a neighbourhood in the "
-    "sidebar (or above) to highlight it and see its full profile below."
+    "Hover a circle for a quick summary. Pick a neighbourhood in the "
+    "Spotlight menu (left) to highlight it and read its full story below."
 )
 
-# -------------------------------------------------------------- detail card
+# ------------------------------------------------------------- spotlight
 if selected_name and selected_name in set(hoods["neighbourhood"]):
     st.markdown("### Neighbourhood spotlight")
     row = hoods.loc[hoods["neighbourhood"] == selected_name].iloc[0]
+
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Incidents", row["incidents_fmt"])
     c2.metric("Rank by volume", f"#{int(row['rank'])} of {len(hoods)}")
-    c3.metric("Top crime type", row["top_type"])
-    c4.metric("Archetype", row["archetype"])
+    c3.metric("Most common type", row["top_type"])
+    c4.metric("Color group", row["archetype"])
 
-    st.markdown(f"**{selected_name}** - crime mix (share of its incidents)")
-    hood_mix = mix.loc[selected_name].sort_values(ascending=False) * 100
-    st.bar_chart(hood_mix, horizontal=True, x_label="share of incidents (%)")
+    # Auto-written plain-English story.
+    hood_mix = mix.loc[selected_name]
+    top_share = hood_mix.max() * 100
+    city_mix = view["TYPE"].value_counts(normalize=True)
+    ratio = hood_mix / city_mix.reindex(hood_mix.index).fillna(0)
+    ratio = ratio.replace([np.inf, -np.inf], np.nan).dropna()
+    over = ratio[ratio >= 1.15].sort_values(ascending=False).head(2)
+
+    story = [
+        f"**{selected_name}** reported **{row['incidents_fmt']}** incidents "
+        f"in this selection - it ranks **#{int(row['rank'])}** out of "
+        f"{len(hoods)} neighbourhoods.",
+        f"The most common type is **{row['top_type']}**, making up "
+        f"**{top_share:.0f}%** of its incidents.",
+    ]
+    for type_name, r in over.items():
+        story.append(
+            f"It reports **{r:.1f}x more {type_name}** than the city average."
+        )
+    if over.empty:
+        story.append(
+            "Its crime mix is close to the city average - no type stands out "
+            "as unusually common."
+        )
+    group_members = sorted(
+        hoods.loc[hoods["cluster"] == row["cluster"], "neighbourhood"].tolist()
+    )
+    story.append(
+        f"Color group **{row['archetype']}** - neighbourhoods with a similar "
+        f"crime pattern: {', '.join(group_members)}."
+    )
+
+    st.markdown(f"**{selected_name} at a glance**")
+    for line in story:
+        st.markdown(f"- {line}")
+
+    st.markdown(f"**{selected_name}** - share of each crime type")
+    st.bar_chart(hood_mix.sort_values(ascending=False) * 100, horizontal=True,
+                 x_label="share of incidents (%)")
 else:
-    st.info("Tip: pick a neighbourhood from the sidebar Spotlight picker to "
-            "see its full profile here.")
+    st.info(
+        "Pick a neighbourhood in the **Spotlight** menu (left sidebar) to "
+        "read its full story here."
+    )
 
-# ------------------------------------------------------- archetype details
-with st.expander("What is in each archetype?"):
+# ----------------------------------------------------- all neighbourhoods
+st.markdown("### All neighbourhoods at a glance")
+overview = hoods[
+    ["neighbourhood", "incidents_fmt", "rank", "top_type", "archetype"]
+].rename(
+    columns={
+        "neighbourhood": "Neighbourhood",
+        "incidents_fmt": "Incidents",
+        "rank": "Rank",
+        "top_type": "Most common type",
+        "archetype": "Color group",
+    }
+).sort_values("Rank")
+st.dataframe(overview, width="stretch", hide_index=True)
+
+# ------------------------------------------------------- archetype explainer
+with st.expander("What do the color groups mean?"):
+    st.markdown(
+        "The app looks at each neighbourhood's mix of crime types and groups "
+        "together the ones that look alike - like sorting music into genres. "
+        "You can change how many groups it creates in the sidebar."
+    )
     for c, info in clusters.items():
         emoji = CLUSTER_EMOJI[int(c) % len(CLUSTER_EMOJI)]
         members = sorted(
@@ -233,22 +314,11 @@ with st.expander("What is in each archetype?"):
         )
         st.markdown(
             f"{emoji} **{info['name']} - {info['signature']}** "
-            f"({len(members)} neighbourhoods): "
-            f"*{', '.join(members)}*"
+            f"({len(members)}): *{', '.join(members)}*"
         )
 
-with st.expander("How this page works"):
-    st.markdown(
-        "1. Each neighbourhood's crime mix is normalized (share of each of "
-        "the 11 types).\n"
-        "2. k-means groups neighbourhoods with similar mixes into archetypes "
-        "(set the number in the sidebar).\n"
-        "3. The map colors each neighbourhood by archetype; circle size is "
-        "incident count; positions are median in-bounds UTM coordinates "
-        "converted to lat/lon.\n"
-        "4. Out-of-bounds coordinates are excluded as data-quality errors."
-    )
 st.caption(
-    "Aggregated display only - no individual incident locations. See the "
-    "Methodology & Limitations page for dataset caveats."
+    "Data: Vancouver Police Department open data (reported incidents, "
+    "2003-2026; 2022 missing). Locations are aggregated - no exact crime "
+    "locations are shown. See Methodology & Limitations for details."
 )
