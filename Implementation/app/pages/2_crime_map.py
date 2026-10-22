@@ -4,8 +4,8 @@ Pipeline: filter -> privacy-safe aggregation (median in-bounds coordinates
 per neighbourhood) -> k-means clustering of crime-type mixes -> interactive
 pydeck map colored by archetype.
 
-No raw incident coordinates are ever plotted (see docs/security/
-privacy_and_data_protection.md).
+Design for usability: the legend (color = archetype) sits right above the
+map, all controls live in the sidebar, and archetype details are one expander.
 """
 import numpy as np
 import pandas as pd
@@ -15,7 +15,6 @@ import streamlit as st
 from app.utils.clusters import (
     cluster_neighbourhoods,
     crime_mix,
-    describe_clusters,
 )
 from app.utils.geo import aggregate_neighbourhoods
 from app.utils.ui import require_data
@@ -25,34 +24,35 @@ CLUSTER_COLORS = [
     [55, 126, 184, 180],   # blue
     [77, 175, 74, 180],    # green
     [255, 127, 0, 180],    # orange
+    [128, 0, 128, 180],    # purple
 ]
+CLUSTER_EMOJI = ["🟥", "🟦", "🟩", "🟧", "🟪"]
 
 st.title("Crime Map")
 st.markdown(
-    "Neighbourhood-level incident density, clustered by crime profile. "
-    "Each circle is an entire neighbourhood (median location, aggregated "
-    "counts) - never raw incident points."
+    "Each circle is one neighbourhood (median location, aggregated counts - "
+    "never raw incident points). Colors are **archetypes** found by k-means "
+    "clustering on each neighbourhood's crime mix."
 )
 
 df = require_data()
 if df is None:
     st.stop()
 
-# ------------------------------------------------------------------ filters
-st.markdown("### Filters")
-f1, f2, f3 = st.columns(3)
-
-with f1:
+# ------------------------------------------------------------ sidebar filters
+with st.sidebar:
+    st.markdown("### Map filters")
     min_year, max_year = int(df["YEAR"].min()), int(df["YEAR"].max())
     year_range = st.slider(
         "Year range", min_value=min_year, max_value=max_year,
         value=(min_year, max_year),
     )
-with f2:
     all_types = sorted(df["TYPE"].dropna().unique())
     selected_types = st.multiselect("Crime types", all_types, default=all_types)
-with f3:
-    k = st.select_slider("Number of archetypes (clusters)", options=[2, 3, 4, 5], value=4)
+    k = st.select_slider(
+        "Number of archetypes", options=[2, 3, 4, 5], value=4,
+        help="How many neighbourhood groups should k-means look for?",
+    )
 
 mask = (
     df["YEAR"].between(*year_range)
@@ -81,7 +81,6 @@ else:
     hoods["archetype"] = "all"
     clusters = {0: {"name": "all", "top_types": []}}
 
-# Defensive: drop any neighbourhood that could not be clustered.
 hoods = hoods.dropna(subset=["cluster"])
 if hoods.empty:
     st.warning("Not enough valid neighbourhood data in this filter.")
@@ -93,12 +92,25 @@ hoods["color"] = hoods["cluster"].map(
 hoods["radius"] = np.sqrt(hoods["incidents"]) * 35
 
 st.caption(
-    f"Showing {len(hoods)} neighbourhoods, {len(view):,} incidents "
+    f"{len(hoods)} neighbourhoods, {len(view):,} incidents "
     f"({year_range[0]}-{year_range[1]}, {len(selected_types)} crime types), "
     f"{n_clusters} archetypes."
 )
 
+# -------------------------------------------------------------------- legend
+st.markdown("### Color legend - each archetype is one color")
+legend_cols = st.columns(n_clusters)
+for i, (c, info) in enumerate(clusters.items()):
+    emoji = CLUSTER_EMOJI[int(c) % len(CLUSTER_EMOJI)]
+    signature = ", ".join(t.split(" (")[0] for t in info["top_types"])
+    legend_cols[i].markdown(
+        f"{emoji} **{info['name']}**  \n"
+        f"<small>{signature}</small>",
+        unsafe_allow_html=True,
+    )
+
 # ---------------------------------------------------------------------- map
+st.markdown("### Interactive map")
 layer = pdk.Layer(
     "ScatterplotLayer",
     data=hoods,
@@ -126,19 +138,31 @@ st.pydeck_chart(
     ),
     width="stretch",
 )
+st.caption(
+    "How to read it: circle size = number of incidents. Hover any circle for "
+    "its neighbourhood, top crime type, and archetype. Colors match the "
+    "legend above."
+)
 
-# ------------------------------------------------------------- archetypes
-st.markdown("### Neighbourhood archetypes (k-means on crime-type mix)")
-summary = describe_clusters(
-    result["labels"], clusters
-) if len(mix) >= 2 else pd.DataFrame()
-st.dataframe(summary, width="stretch", hide_index=True)
+# ------------------------------------------------------- archetype details
+with st.expander("What is in each archetype?"):
+    for c, info in clusters.items():
+        emoji = CLUSTER_EMOJI[int(c) % len(CLUSTER_EMOJI)]
+        members = sorted(
+            hoods.loc[hoods["cluster"] == c, "neighbourhood"].tolist()
+        )
+        st.markdown(
+            f"{emoji} **{info['name']}** "
+            f"({len(members)} neighbourhoods): "
+            f"*{', '.join(members)}*"
+        )
 
-with st.expander("How this works"):
+with st.expander("How this page works"):
     st.markdown(
         "1. Each neighbourhood's crime mix is normalized (share of each of "
         "the 11 types).\n"
-        "2. k-means groups neighbourhoods with similar mixes into archetypes.\n"
+        "2. k-means groups neighbourhoods with similar mixes into archetypes "
+        "(set the number in the sidebar).\n"
         "3. The map colors each neighbourhood by archetype; circle size is "
         "incident count; positions are median in-bounds UTM coordinates "
         "converted to lat/lon.\n"
