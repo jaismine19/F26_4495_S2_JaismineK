@@ -83,6 +83,28 @@ if hoods.empty:
     st.warning("Not enough valid neighbourhood data in this filter.")
     st.stop()
 
+# ------------------------------------------------------- spotlight picker
+hood_names = sorted(hoods["neighbourhood"].tolist())
+
+
+def _set_spotlight() -> None:
+    picked = st.session_state.get("spotlight_picker", "(none)")
+    st.session_state["spotlight"] = None if picked == "(none)" else picked
+
+
+with st.sidebar:
+    st.markdown("### Spotlight")
+    current = st.session_state.get("spotlight")
+    default_idx = hood_names.index(current) + 1 if current in hood_names else 0
+    st.selectbox(
+        "Neighbourhood",
+        ["(none)"] + hood_names,
+        index=default_idx,
+        key="spotlight_picker",
+        on_change=_set_spotlight,
+        help="Highlight a neighbourhood on the map and see its full profile.",
+    )
+
 max_incidents = float(hoods["incidents"].max())
 hoods["radius"] = (
     60.0 + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 3000.0
@@ -127,20 +149,8 @@ base_layer = pdk.Layer(
     radius_max_pixels=45,
 )
 
-def _extract_objects(result):
-    """Read clicked objects from a pydeck selection result, if any."""
-    if result is None:
-        return None
-    state = getattr(result, "selection", None)
-    if not state:
-        return None
-    # SelectionState is dict-like; access by key, not attribute.
-    return state.get("objects") if isinstance(state, dict) else getattr(state, "objects", None)
-
-
-# Draw the deck. If a neighbourhood was selected in a previous click, add a
-# highlight layer around it so the selection is visible on the map itself.
-selected_name = st.session_state.get("selected_hood")
+# The picked neighbourhood drives the highlight layer and the profile card.
+selected_name = st.session_state.get("spotlight")
 
 layers = [base_layer]
 if selected_name and selected_name in set(hoods["neighbourhood"]):
@@ -164,7 +174,7 @@ if selected_name and selected_name in set(hoods["neighbourhood"]):
 
 view_state = pdk.ViewState(latitude=49.26, longitude=-123.12, zoom=10.6)
 
-selection = st.pydeck_chart(
+st.pydeck_chart(
     pdk.Deck(
         layers=layers,
         initial_view_state=view_state,
@@ -189,24 +199,12 @@ selection = st.pydeck_chart(
             },
         },
     ),
-    on_select="rerun",
-    selection_mode="single-object",
-    key="crime_map_deck",
     width="stretch",
 )
 
-# A click arrives as the previous run's selection event: remember it, then
-# rerun once so the highlight layer above is drawn around the clicked circle.
-objects = _extract_objects(selection)
-if objects and isinstance(objects, list) and objects:
-    clicked = objects[0].get("neighbourhood")
-    if clicked and st.session_state.get("selected_hood") != clicked:
-        st.session_state["selected_hood"] = clicked
-        st.rerun()
-
 st.caption(
-    "Hover for a quick summary - click a circle to highlight it and see its "
-    "full profile below."
+    "Hover any circle for a quick summary. Pick a neighbourhood in the "
+    "sidebar (or above) to highlight it and see its full profile below."
 )
 
 # -------------------------------------------------------------- detail card
@@ -223,8 +221,8 @@ if selected_name and selected_name in set(hoods["neighbourhood"]):
     hood_mix = mix.loc[selected_name].sort_values(ascending=False) * 100
     st.bar_chart(hood_mix, horizontal=True, x_label="share of incidents (%)")
 else:
-    st.info("Tip: click any circle on the map to see that neighbourhood's "
-            "full profile here.")
+    st.info("Tip: pick a neighbourhood from the sidebar Spotlight picker to "
+            "see its full profile here.")
 
 # ------------------------------------------------------- archetype details
 with st.expander("What is in each archetype?"):
