@@ -89,7 +89,13 @@ if hoods.empty:
 hoods["color"] = hoods["cluster"].map(
     lambda c: CLUSTER_COLORS[int(c) % len(CLUSTER_COLORS)]
 )
-hoods["radius"] = np.sqrt(hoods["incidents"]) * 35
+# Scale radii relative to the largest neighbourhood so the map stays
+# readable (CBD dominates counts; raw sqrt scaling produces giant circles).
+max_incidents = float(hoods["incidents"].max())
+hoods["radius"] = (
+    60.0
+    + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 3000.0
+)
 hoods["incidents_fmt"] = hoods["incidents"].map(lambda v: f"{v:,}")
 
 st.caption(
@@ -117,9 +123,12 @@ layer = pdk.Layer(
     get_position=["lon", "lat"],
     get_radius="radius",
     get_fill_color="color",
+    get_line_color=[255, 255, 255, 200],
+    line_width_min_pixels=1,
+    stroked=True,
     pickable=True,
-    radius_min_pixels=4,
-    radius_max_pixels=70,
+    radius_min_pixels=3,
+    radius_max_pixels=45,
 )
 view_state = pdk.ViewState(latitude=49.26, longitude=-123.12, zoom=10.6)
 st.pydeck_chart(
