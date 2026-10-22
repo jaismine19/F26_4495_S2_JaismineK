@@ -4,18 +4,15 @@ Pipeline: filter -> privacy-safe aggregation (median in-bounds coordinates
 per neighbourhood) -> k-means clustering of crime-type mixes -> interactive
 pydeck map colored by archetype.
 
-Design for usability: the legend (color = archetype) sits right above the
-map, all controls live in the sidebar, and archetype details are one expander.
+Interactivity: hover any circle for a quick tooltip, or click it to
+highlight it and see a full detail card (rank, top types, crime mix chart).
 """
 import numpy as np
 import pandas as pd
 import pydeck as pdk
 import streamlit as st
 
-from app.utils.clusters import (
-    cluster_neighbourhoods,
-    crime_mix,
-)
+from app.utils.clusters import cluster_neighbourhoods, crime_mix
 from app.utils.geo import aggregate_neighbourhoods
 from app.utils.ui import require_data
 
@@ -79,24 +76,22 @@ if len(mix) >= 2:
 else:
     hoods["cluster"] = 0
     hoods["archetype"] = "all"
-    clusters = {0: {"name": "all", "top_types": []}}
+    clusters = {0: {"name": "all", "top_types": [], "signature": ""}}
 
 hoods = hoods.dropna(subset=["cluster"])
 if hoods.empty:
     st.warning("Not enough valid neighbourhood data in this filter.")
     st.stop()
 
+max_incidents = float(hoods["incidents"].max())
+hoods["radius"] = (
+    60.0 + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 3000.0
+)
 hoods["color"] = hoods["cluster"].map(
     lambda c: CLUSTER_COLORS[int(c) % len(CLUSTER_COLORS)]
 )
-# Scale radii relative to the largest neighbourhood so the map stays
-# readable (CBD dominates counts; raw sqrt scaling produces giant circles).
-max_incidents = float(hoods["incidents"].max())
-hoods["radius"] = (
-    60.0
-    + np.sqrt(hoods["incidents"]) / np.sqrt(max_incidents) * 3000.0
-)
 hoods["incidents_fmt"] = hoods["incidents"].map(lambda v: f"{v:,}")
+hoods["rank"] = hoods["incidents"].rank(ascending=False, method="min").astype(int)
 
 st.caption(
     f"{len(hoods)} neighbourhoods, {len(view):,} incidents "
@@ -117,7 +112,7 @@ for i, (c, info) in enumerate(clusters.items()):
 
 # ---------------------------------------------------------------------- map
 st.markdown("### Interactive map")
-layer = pdk.Layer(
+base_layer = pdk.Layer(
     "ScatterplotLayer",
     data=hoods,
     get_position=["lon", "lat"],
@@ -127,24 +122,24 @@ layer = pdk.Layer(
     line_width_min_pixels=1,
     stroked=True,
     pickable=True,
-    radius_min_pixels=3,
+    radius_min_pixels=8,
     radius_max_pixels=45,
 )
+
 view_state = pdk.ViewState(latitude=49.26, longitude=-123.12, zoom=10.6)
-st.pydeck_chart(
+
+selection = st.pydeck_chart(
     pdk.Deck(
-        layers=[layer],
+        layers=[base_layer],
         initial_view_state=view_state,
         map_style="light",
         tooltip={
             "html": (
                 "<div style='font-family:-apple-system, Segoe UI, Roboto, "
-                "sans-serif; padding:4px 8px; min-width:180px;'>"
+                "sans-serif; padding:4px 8px; min-width:170px;'>"
                 "<b style='font-size:13px;'>{neighbourhood}</b><br/>"
                 "<span style='font-size:12px; color:#444444;'>{incidents_fmt} "
                 "incidents</span><br/>"
-                "<span style='font-size:12px; color:#444444;'>Top type: "
-                "{top_type}</span><br/>"
                 "<span style='font-size:12px; color:#1a1a1a;'>"
                 "<b>{archetype}</b></span>"
                 "</div>"
@@ -158,13 +153,36 @@ st.pydeck_chart(
             },
         },
     ),
+    on_select="rerun",
+    selection_mode="single-object",
     width="stretch",
 )
+
+# Selected neighbourhood from the click event (None when nothing is selected).
+objects = getattr(getattr(selection, "selection", None), "objects", None)
+selected_name = objects[0].get("neighbourhood") if objects else None
+
 st.caption(
-    "How to read it: circle size = number of incidents. Hover any circle for "
-    "its neighbourhood, top crime type, and archetype group. Colors match the "
-    "legend above."
+    "Hover for a quick summary - click a circle to highlight it and see its "
+    "full profile below."
 )
+
+# -------------------------------------------------------------- detail card
+if selected_name and selected_name in set(hoods["neighbourhood"]):
+    st.markdown("### Neighbourhood spotlight")
+    row = hoods.loc[hoods["neighbourhood"] == selected_name].iloc[0]
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Incidents", row["incidents_fmt"])
+    c2.metric("Rank by volume", f"#{int(row['rank'])} of {len(hoods)}")
+    c3.metric("Top crime type", row["top_type"])
+    c4.metric("Archetype", row["archetype"])
+
+    st.markdown(f"**{selected_name}** - crime mix (share of its incidents)")
+    hood_mix = mix.loc[selected_name].sort_values(ascending=False) * 100
+    st.bar_chart(hood_mix, horizontal=True, x_label="share of incidents (%)")
+else:
+    st.info("Tip: click any circle on the map to see that neighbourhood's "
+            "full profile here.")
 
 # ------------------------------------------------------- archetype details
 with st.expander("What is in each archetype?"):
