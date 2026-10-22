@@ -31,3 +31,10 @@
 | Oct 22, 2026 | 1.0 | Wrote tests for the database, including trying SQL injection attacks to check they are stored as plain text and cannot break anything; the test suite now has 51 passing tests |
 | Oct 22, 2026 | 1.5 | Fixed merge conflicts with Shashank's work (login lockout and the Audit Log page) and updated the Security page statuses |
 | Oct 22, 2026 | 1.0 | Practiced the demo flow (login, roles, audit trail) and made a cheat sheet for the presentation |
+| Oct 23, 2026 | 1.0 | Started planning the neighbourhood map feature: decided to show neighbourhood-level data instead of raw points to keep it privacy-safe, and sketched how the page should work (filters -> grouped data -> map) |
+| Oct 23, 2026 | 1.5 | Worked on the coordinate conversion: turned the dataset's UTM coordinates into latitude and longitude using the standard map formulas, and checked the math against known Vancouver locations |
+| Oct 24, 2026 | 1.0 | Wrote the neighbourhood grouping logic: counts and median location per neighbourhood, with a check that skips coordinates outside Vancouver (data-quality guard) |
+| Oct 24, 2026 | 1.0 | Added the clustering part: grouped neighbourhoods by how similar their crime mixes are (k-means), so the map can show neighbourhood archetypes instead of plain dots |
+| Oct 25, 2026 | 1.5 | Built the Crime Map page in the app: filters, the interactive map with circles sized by incident count and colored by archetype, hover details, and the archetype summary table |
+| Oct 25, 2026 | 1.0 | Wrote tests for the map code (coordinate math, grouping, clustering) and fixed a bug where neighbourhoods with missing names crashed the page; the test suite now has 61 passing tests |
+| Oct 26, 2026 | 0.5 | Went through the map page end to end with the demo in mind and updated the demo cheat sheet |
