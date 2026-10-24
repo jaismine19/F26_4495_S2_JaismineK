@@ -2,44 +2,49 @@
 
 | Date | Hours | Description of work done |
 |---|---|---|
-| Sep 26, 2026 | 1.5 | GitHub/repository setup: created the project repository, added Shashank as collaborator, initial commit |
-| Oct 9, 2026 | 1.0 | Reviewed project state, timeline phases, and upcoming deliverables against the repo |
-| Oct 9, 2026 | 0.5 | Project setup with Shashank: created folder structure (data/, scripts/, docs/, app/, tests/, worklogs/) and .gitignore |
-| Oct 9, 2026 | 0.5 | Data acquisition with Shashank: downloaded VPD crime dataset from GeoDASH open data; reviewed the data quality summary (928,362 rows; missing 2022; 83K zero coordinates) |
-| Oct 9, 2026 | 0.25 | Contributed to docs/research/dataset_documentation.md (source, schema, quality findings, privacy notes) |
-| Oct 9, 2026 | 0.25 | Reviewed Shashank's threat model draft (docs/security/threat_model.md) |
-| Oct 9, 2026 | 0.25 | Data cleaning with Shashank: reviewed scripts/02_clean_data.py and the cleaning log (928,362 -> 893,851 rows) |
-| Oct 9, 2026 | 0.25 | Reviewed privacy review draft (docs/security/privacy_and_data_protection.md) |
-| Oct 9, 2026 | 0.25 | Repository maintenance: README progress table updates; commit and push |
-| Oct 11, 2026 | 1.0 | Local environment setup: created virtual environment and installed requirements |
-| Oct 11, 2026 | 1.0 | Ran the full data pipeline end-to-end: downloaded VPD dataset, generated quality summary, ran cleaning (928,362 -> 893,851 rows) |
-| Oct 11, 2026 | 0.5 | Reviewed the data pipeline scripts (00_download_data, 01_inspect_data, 02_clean_data) and their quality/cleaning reports |
-| Oct 11, 2026 | 0.5 | Reviewed the dataset documentation and privacy notes (docs/research/, docs/security/) |
-| Oct 11, 2026 | 0.5 | Ran and explored the Streamlit app: Overview, Temporal Analysis, and the Add Incident role-based demo (admin/analyst/entry) |
-| Oct 11, 2026 | 0.5 | Reviewed the app structure: Home.py navigation, pages, and utils (auth, data loader, UI helpers) |
-| Oct 11, 2026 | 0.5 | Reviewed the functional test suite and ran pytest (14 tests passing: cleaning, inspection, auth) |
-| Oct 11, 2026 | 0.5 | App edit: removed the course-code/prototype caption from the sidebar; committed and pushed |
-| Oct 11, 2026 | 1.5 | Performed exploratory analysis: crime-type x hour patterns (including the redacted-timestamp finding for violent types) and pandemic comparison (2019-2020-2021-2023) |
-| Oct 11, 2026 | 1.0 | Built the temporal & pandemic analysis notebook (notebooks/02_temporal_and_pandemic_analysis.ipynb) with 5 documented findings and charts |
-| Oct 11, 2026 | 1.0 | Read about EDA techniques and brainstormed approaches to reduce redundancy in the dataset |
-| Oct 12, 2026 | 1.0 | Reviewed and refined the analysis notebook structure, headings, and findings formatting |
-| Oct 12, 2026 | 0.5 | Prepared Progress Report #1: work-log table, summary, repo check-in, and AI-use section |
-| Oct 16, 2026 | 1.5 | Worked on the Statistical Analysis page: chi-square tests (crime type x season, crime type x day of week), reviewed observed/expected tables and the season-share heatmap |
-| Oct 16, 2026 | 3.0 | Debugged and fixed a datetime parsing bug: midnight timestamps were written without the time part, breaking INCIDENT_DATETIME loading; added ISO date format in the cleaning script and defensive parsing in the data loader |
-| Oct 22, 2026 | 1.0 | Went through the project to figure out which features could be built all the way through (from the screen to the database and back) for the mid-course demo - decided on the Add Incident feature |
-| Oct 22, 2026 | 1.5 | Built the Add Incident feature from front to back: set up the SQLite database with safe queries, connected the incident form to the validation rules, saved each record with who added it and when, and showed the saved entries in the app |
-| Oct 22, 2026 | 1.0 | Wrote tests for the database, including trying SQL injection attacks to check they are stored as plain text and cannot break anything; the test suite now has 51 passing tests |
-| Oct 22, 2026 | 1.5 | Fixed merge conflicts with Shashank's work (login lockout and the Audit Log page) and updated the Security page statuses |
+| Sep 26, 2026 | 1.5 | Set up our shared project on GitHub: created the repository, invited Shashank as a collaborator, and made the first upload |
+| Oct 9, 2026 | 1.0 | Read through the project to remind myself where we are, what the plan is, and what is due next |
+| Oct 9, 2026 | 0.5 | Together with Shashank, created the project folders and the file that keeps large and private files out of GitHub |
+| Oct 9, 2026 | 0.5 | Together with Shashank, downloaded the Vancouver crime data from the police open-data website and went through the quality report (928,362 rows, missing year 2022, 83K rows with no location) |
+| Oct 9, 2026 | 0.25 | Helped write the document that explains our data - where it comes from, what each column means, and its known problems |
+| Oct 9, 2026 | 0.25 | Read Shashank's first version of the security plan and gave feedback |
+| Oct 9, 2026 | 0.25 | Together with Shashank, went through the data cleaning steps (removed repeated rows; 928,362 down to 893,851 rows) |
+| Oct 9, 2026 | 0.25 | Read the privacy notes document and checked it over |
+| Oct 9, 2026 | 0.25 | Updated the README progress table and uploaded the work to GitHub |
+| Oct 11, 2026 | 1.0 | Set up the coding environment on my own computer and installed all the needed tools |
+| Oct 11, 2026 | 1.0 | Ran the whole data preparation process myself from start to finish: download, quality check, and cleaning |
+| Oct 11, 2026 | 0.5 | Read the three data preparation scripts and their reports so I understand how each step works |
+| Oct 11, 2026 | 0.5 | Read the data explanation and privacy documents |
+| Oct 11, 2026 | 0.5 | Opened the app and explored it: the overview page, the time-patterns page, and the add-incident page with its three user roles |
+| Oct 11, 2026 | 0.5 | Read through the app's structure: how the pages connect, the login system, and how data is loaded |
+| Oct 11, 2026 | 0.5 | Read the automated tests and ran them (14 passing) |
+| Oct 11, 2026 | 0.5 | Made a small app change: removed the course-code label from the sidebar and uploaded it |
+| Oct 11, 2026 | 1.5 | Explored the data for patterns: when crimes happen during the day (and found that violent crimes have their exact time hidden on purpose), and how COVID changed the numbers |
+| Oct 11, 2026 | 1.0 | Wrote a notebook that documents 5 findings with charts |
+| Oct 11, 2026 | 1.0 | Read about ways to explore data and thought about how to remove repeated rows |
+| Oct 12, 2026 | 1.0 | Cleaned up the notebook: better headings and a clearer layout |
+| Oct 12, 2026 | 0.5 | Prepared Progress Report #1: the hours table, the summary, the list of uploaded work, and the AI-use section |
+| Oct 16, 2026 | 1.5 | Built the statistics page: two "is there a connection?" tests (crime type vs season, crime type vs day of week) with easy-to-read results and tables |
+| Oct 16, 2026 | 3.0 | Chased and fixed a bug where dates were being saved in two different formats, which broke anything that used dates; fixed the saving side and made the reading side safe too |
+| Oct 22, 2026 | 1.0 | Looked through the project to pick a feature I could build completely - from the screen to the database and back - for the mid-course demo; chose the Add Incident feature |
+| Oct 22, 2026 | 1.5 | Built the Add Incident feature end to end: a form with checks, saved into a database with safe queries, each record stored with who added it and when, and shown in the app |
+| Oct 22, 2026 | 1.0 | Wrote tests for the database, including trying fake "hacking" inputs to check they are stored as plain text and cannot break anything (51 tests passing) |
+| Oct 22, 2026 | 1.5 | Combined my work with Shashank's overlapping changes (login lockout and the Audit Log page) and updated the Security page statuses |
 | Oct 22, 2026 | 1.0 | Practiced the demo flow (login, roles, audit trail) and made a cheat sheet for the presentation |
-| Oct 22, 2026 | 1.0 | Tested the Crime Map from a first-time user's point of view and listed what felt unclear (color meaning, hover info, circle sizes) |
-| Oct 22, 2026 | 1.0 | Redesigned the map page for non-technical users: plain-English how-to guide, big-picture stats, auto-written neighbourhood summaries, and a full details table |
-| Oct 22, 2026 | 1.5 | Fixed the map interactivity: switched to a map engine with reliable hover tooltips and click-to-highlight selection |
-| Oct 22, 2026 | 0.5 | Fixed the broken map background (the old free map provider started requiring an API key) by switching to a free street-map provider |
-| Oct 22, 2026 | 1.0 | Fixed a crash that happened when filters left no usable map coordinates, and added a regression test; the test suite now has 62 passing tests |
-| Oct 23, 2026 | 1.0 | Started planning the neighbourhood map feature: decided to show neighbourhood-level data instead of raw points to keep it privacy-safe, and sketched how the page should work (filters -> grouped data -> map) |
-| Oct 23, 2026 | 1.5 | Worked on the coordinate conversion: turned the dataset's UTM coordinates into latitude and longitude using the standard map formulas, and checked the math against known Vancouver locations |
-| Oct 24, 2026 | 1.0 | Wrote the neighbourhood grouping logic: counts and median location per neighbourhood, with a check that skips coordinates outside Vancouver (data-quality guard) |
-| Oct 24, 2026 | 1.0 | Added the clustering part: grouped neighbourhoods by how similar their crime mixes are (k-means), so the map can show neighbourhood archetypes instead of plain dots |
-| Oct 25, 2026 | 1.5 | Built the Crime Map page in the app: filters, the interactive map with circles sized by incident count and colored by archetype, hover details, and the archetype summary table |
-| Oct 25, 2026 | 1.0 | Wrote tests for the map code (coordinate math, grouping, clustering) and fixed a bug where neighbourhoods with missing names crashed the page; the test suite now has 61 passing tests |
-| Oct 26, 2026 | 0.5 | Went through the map page end to end with the demo in mind and updated the demo cheat sheet |
+| Oct 22, 2026 | 1.0 | Tested the Crime Map as if I were seeing it for the first time and listed what felt unclear (color meaning, hover info, circle sizes) |
+| Oct 22, 2026 | 1.0 | Redesigned the map page for everyday users: a simple how-to guide, big-picture numbers, automatically written neighbourhood summaries, and a full details table |
+| Oct 22, 2026 | 1.5 | Fixed the map interactivity: switched to a map tool whose hover popups and click-to-highlight work reliably |
+| Oct 22, 2026 | 0.5 | Fixed the broken map background (the old free map provider started asking for an API key) by switching to a free street-map provider |
+| Oct 22, 2026 | 1.0 | Fixed a crash that happened when a filter left no usable location data, and added a test so it cannot happen again (62 tests passing) |
+| Oct 23, 2026 | 1.0 | Started planning the neighbourhood map feature: decided to show neighbourhood-level summaries instead of exact points to protect privacy, and sketched how the page should flow |
+| Oct 23, 2026 | 1.5 | Worked on the location math: converted the data's map coordinates into latitude and longitude using standard formulas, and checked the results against known Vancouver places |
+| Oct 23, 2026 | 1.0 | Planned the forecast feature: decided to predict monthly crime counts using the average of recent months, and to honestly show how wrong the guess has been |
+| Oct 23, 2026 | 1.5 | Built the forecast feature: pick a crime type, see the next 12 months predicted, and see how accurate it was in the past compared with a "same as last year" guess |
+| Oct 23, 2026 | 0.5 | Wrote tests for the forecast math (7 new tests; 69 passing in total) |
+| Oct 23, 2026 | 0.5 | Added a "tech stack" section to the README and the Methodology page so the tools we use are clear to anyone |
+| Oct 23, 2026 | 0.5 | Updated the README progress table and folder-structure section to match the current state of the project |
+| Oct 24, 2026 | 1.0 | Wrote the neighbourhood grouping step: counts and a middle-point location for each neighbourhood, skipping coordinates outside Vancouver |
+| Oct 24, 2026 | 1.0 | Added the grouping step: automatically put neighbourhoods with similar crime mixes together, so the map shows patterns instead of plain dots |
+| Oct 25, 2026 | 1.5 | Built the Crime Map page in the app: filters, the interactive map with circles sized by count and colored by pattern group, hover details, and the group summary table |
+| Oct 25, 2026 | 1.0 | Wrote tests for the map math and grouping, and fixed a bug where neighbourhoods with missing names crashed the page (61 tests passing) |
+| Oct 26, 2026 | 0.5 | Walked through the map page from top to bottom with the demo in mind and updated the demo cheat sheet |
