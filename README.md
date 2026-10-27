@@ -22,7 +22,7 @@ F26_4495_S2_JaismineK/
 │   ├── app/                 # Streamlit app (Home.py + 9 pages + utils/)
 │   ├── scripts/             # Reproducible data pipeline scripts
 │   ├── notebooks/           # Exploratory/statistical/ML notebooks
-│   └── tests/               # pytest suite (62 tests)
+│   └── tests/               # pytest suite
 ├── data/
 │   ├── raw/                 # Downloaded VPD dataset (gitignored)
 │   └── processed/           # Cleaned data + quality summaries (gitignored)
@@ -69,7 +69,7 @@ streamlit run Implementation/app/Home.py
 | ML | Moving-average + seasonal-naive baseline forecast with MAE/RMSE |
 | Data | VPD GeoDASH CSV pipeline (pandas) + SQLite (user-entered records) |
 | Security | PBKDF2 password hashing, RBAC, login lockout, append-only audit log, input validation/sanitization, parameterized SQL |
-| Testing | pytest (62 tests: pipeline, security, stats, geo, clustering, forecast, db) |
+| Testing | pytest (pipeline, security, stats, geo, clustering, forecast, db) |
 
 ### Completed so far
 
@@ -80,13 +80,15 @@ streamlit run Implementation/app/Home.py
 - Initial data quality inspection (see `data/processed/data_quality_summary.txt`)
 - Data cleaning pipeline: 928,362 -> 893,851 rows (see `data/processed/cleaning_log.txt`)
 - Dataset documentation (`docs/research/dataset_documentation.md`)
-- Cybersecurity threat model v0.3 (`docs/security/threat_model.md`)
+- Cybersecurity threat model v0.4 (`docs/security/threat_model.md`)
 - Privacy review & data protection requirements (`docs/security/privacy_and_data_protection.md`)
 - Reproducible download, inspection, and cleaning scripts (`Implementation/scripts/`)
 - Streamlit app: Overview, Temporal Analysis, Statistical Analysis, Crime Map,
   Machine Learning, Add Incident, Security, Methodology, and Audit Log pages
-- End-to-end Add Incident feature: validated form -> SQLite (parameterized
-  queries) -> RBAC + audit trail -> separate user-entries display
+- End-to-end Add Incident feature: validated form (crime type, neighbourhood,
+  date, hour, location, notes) -> SQLite (parameterized queries) -> RBAC +
+  audit trail -> separate user-entries display (admins see all records,
+  other roles only their own)
 - Crime Map: UTM-to-latlon conversion, privacy-safe neighbourhood aggregation,
   k-means crime-profile clustering, interactive folium map with hover/click
 - Statistical Analysis: chi-square tests (type x season, type x day-of-week)
@@ -99,7 +101,7 @@ streamlit run Implementation/app/Home.py
 - Temporal & pandemic analysis notebook (`notebooks/02_temporal_and_pandemic_analysis.ipynb`):
   crime-type hour patterns, redacted-timestamp finding, COVID comparison,
   seasonality and neighbourhood-change hypotheses
-- Test suite: 62 tests passing (pipeline, security, stats, geo, clustering,
+- Test suite: 73 tests passing (pipeline, security, stats, geo, clustering,
   forecast, db) - run with `pytest Implementation/tests/ -v`
 
 ### Key data quality findings

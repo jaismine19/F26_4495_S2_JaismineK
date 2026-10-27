@@ -82,3 +82,34 @@ class TestInjectionSafety:
         rows = db.fetch_incidents()
         assert len(rows) == 1
         assert rows[0]["created_by"] == "entry'); DROP TABLE incidents; --"
+
+
+class TestHourAndRole:
+    def test_hour_stored(self):
+        new_id = db.insert_incident(valid_record(hour=14), "entry", "Data Entry")
+        row = db.fetch_incidents()[0]
+        assert row["id"] == new_id
+        assert row["hour"] == 14
+        assert row["created_role"] == "Data Entry"
+
+    def test_hour_not_recorded_is_null(self):
+        db.insert_incident(valid_record(), "entry")
+        assert db.fetch_incidents()[0]["hour"] is None
+
+
+class TestAccessControl:
+    def test_count_incidents(self):
+        assert db.count_incidents() == 0
+        db.insert_incident(valid_record(), "admin", "Administrator")
+        db.insert_incident(valid_record(), "entry", "Data Entry")
+        assert db.count_incidents() == 2
+
+    def test_fetch_filtered_by_user(self):
+        db.insert_incident(valid_record(), "admin", "Administrator")
+        db.insert_incident(valid_record(), "entry", "Data Entry")
+
+        admin_rows = db.fetch_incidents(created_by="admin")
+        assert len(admin_rows) == 1
+        assert admin_rows[0]["created_by"] == "admin"
+
+        assert len(db.fetch_incidents()) == 2

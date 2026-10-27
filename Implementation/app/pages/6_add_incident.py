@@ -97,6 +97,12 @@ neighbourhood = st.selectbox(
     "Neighbourhood", sorted(ALLOWED_NEIGHBOURHOODS), index=None,
     placeholder="Select a neighbourhood...",
 )
+hour = st.selectbox(
+    "Hour of day",
+    ["Not recorded"] + list(range(24)),
+    index=0,
+    format_func=lambda h: "Not recorded" if h == "Not recorded" else f"{h:02d}:00",
+)
 location = st.text_input(
     "Location (hundred block or general area)", max_chars=100,
 )
@@ -107,6 +113,7 @@ if st.button("Submit incident"):
         "crime_type": crime_type or "",
         "incident_date": incident_date,
         "neighbourhood": neighbourhood or "",
+        "hour": None if hour == "Not recorded" else int(hour),
         "location": location or "",
         "notes": notes or "",
     }
@@ -116,7 +123,7 @@ if st.button("Submit incident"):
             st.error(f"{field}: {message}")
     else:
         record["notes"] = validate_notes(record["notes"])
-        new_id = db.insert_incident(record, user["username"])
+        new_id = db.insert_incident(record, user["username"], user["role"])
         log_audit(
             user["username"],
             "incident_added",
@@ -127,7 +134,13 @@ if st.button("Submit incident"):
 
 # ------------------------------------------------- user-entered records list
 st.markdown("### Prototype entries (user-entered, separate from VPD data)")
-entries = db.fetch_incidents(limit=20)
+st.metric("Total user-entered incidents", db.count_incidents())
+if has_permission(user, "view_audit"):
+    entries = db.fetch_incidents(limit=20)
+    st.caption("You are an Administrator and can see all entered records.")
+else:
+    entries = db.fetch_incidents(limit=20, created_by=user["username"])
+    st.caption("You can see only the records you entered.")
 if not entries:
     st.caption("No prototype entries yet. Submit the form above to create one.")
 else:

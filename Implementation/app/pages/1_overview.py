@@ -1,6 +1,8 @@
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from app.utils import db
 from app.utils.ui import require_data
 
 st.title("Overview")
@@ -51,3 +53,33 @@ st.plotly_chart(
     ),
     width="stretch",
 )
+
+st.markdown("### Prototype incident database (user-entered)")
+db.init_db()
+user_total = db.count_incidents()
+c1, c2 = st.columns(2)
+c1.metric("User-entered incidents", user_total)
+c2.metric(
+    "Public dataset incidents",
+    f"{len(df):,}",
+    help="User-entered records are stored separately and are never mixed "
+    "into the public historical data.",
+)
+if user_total:
+    recent = db.fetch_incidents(limit=5)
+    st.markdown("Latest entries (use the **Add Incident** page to add more):")
+    table = pd.DataFrame(recent).rename(
+        columns={
+            "id": "ID",
+            "crime_type": "Crime type",
+            "neighbourhood": "Neighbourhood",
+            "incident_date": "Date",
+            "location": "Location",
+            "created_by": "Entered by",
+        }
+    )
+    st.dataframe(
+        table[["ID", "Crime type", "Neighbourhood", "Date", "Location", "Entered by"]],
+        hide_index=True,
+        width="stretch",
+    )

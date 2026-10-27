@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.3 - October 15, 2026
+**Status:** Draft v0.4 - October 26, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -57,7 +57,7 @@ Trust boundaries:
 |---|---|---|---|
 | User modifies another user's incident records | Medium | Role-based access control (RBAC); ownership checks on update/delete | Planned |
 | User alters audit logs | Medium | Append-only audit table; no update/delete permissions on logs | Planned |
-| Injection of fake incident data | Low-Medium | All user-entered records tagged with `source='user'` and kept separate from public data | Planned |
+| Injection of fake incident data | Low-Medium | All user-entered records tagged with `source='user'` and kept separate from public data | Implemented |
 
 ### 4.3 Repudiation
 
@@ -109,12 +109,12 @@ Trust boundaries:
 |---|---|---|---|
 | 1 | Password hashing | Critical | Implemented - PBKDF2-HMAC-SHA256, 200k iterations, per-user salt (`app/utils/auth.py`); bcrypt/argon2 upgrade before any non-demo use |
 | 2 | RBAC: Administrator, Analyst, Data Entry | Critical | Implemented - roles + permission sets enforced on Add Incident page |
-| 3 | Parameterized SQL queries | Critical | Planned (with database phase) |
-| 4 | Input validation/encoding (XSS prevention) | High | Implemented (module) - allow-lists for crime type/neighbourhood, date range checks, HTML/script sanitization (`app/utils/validation.py`, 18 tests); awaiting form integration |
+| 3 | Parameterized SQL queries | Critical | Implemented - all incident-store queries use parameterized statements (`app/utils/db.py`); SQL-injection tests included |
+| 4 | Input validation/encoding (XSS prevention) | High | Implemented - allow-lists for crime type/neighbourhood, date range checks, hour-of-day check, HTML/script sanitization (`app/utils/validation.py`, 18 tests); integrated into the Add Incident form |
 | 5 | Audit logging for user actions | High | Implemented (prototype) - append-only JSONL audit log (`log_audit`/`read_audit_log`); DB-backed audit table planned |
 | 6 | Session security (regenerate on login, secure config) | High | Partial - Streamlit session state; hardening planned |
 | 7 | Login attempt limiting | High | Implemented (prototype) - 5 failures per 60s lockout (`record_failed_attempt`/`is_locked_out`) |
-| 8 | Data minimization & coordinate generalization | Medium | Documented in privacy review; map implementation later |
+| 8 | Data minimization & coordinate generalization | Medium | Partially implemented - user-entered incidents stored in a separate SQLite DB (`data/prototype.db`) with block-level locations only; map generalization later |
 | 9 | Dependency scanning (pip-audit) | Medium | Planned (testing phase) |
 | 10 | Secrets management (no keys in repo) | High | In place - `.gitignore`, no credentials committed |
 | 11 | Functional + security test checklist | Medium | In progress - 6 security unit tests added (`tests/test_security.py`) |
@@ -128,7 +128,7 @@ Trust boundaries:
 
 ## 7. Open Questions / Decisions Needed
 
-- Final database choice (SQLite for prototype vs PostgreSQL) - affects controls.
+- Database choice decided: SQLite for the prototype (`data/prototype.db`, parameterized queries); PostgreSQL only if a production deployment is planned.
 - Deployment target (Streamlit Community Cloud vs local) - affects HTTPS/session config.
 - Whether the Add Incident page is behind login only, or also IP-restricted for demos.
 
@@ -139,3 +139,4 @@ Trust boundaries:
 | Oct 9, 2026 | 0.1 | Shashank Chaudhary | Initial draft from proposal threat matrix |
 | Oct 11, 2026 | 0.2 | Shashank Chaudhary | Control statuses updated for implemented auth/RBAC/audit/login-limiting; added login-attempt-limiting control; reflected prototype audit log design |
 | Oct 15, 2026 | 0.3 | Shashank Chaudhary | Input validation module added (allow-lists, date checks, XSS sanitization) with 18 tests; control status updated |
+| Oct 26, 2026 | 0.4 | Shashank Chaudhary | Database & Add Incident phase started: SQLite incident store with parameterized queries, form integration with validation and audit logging, user records kept separate from public data; controls 3, 4, 8 updated |

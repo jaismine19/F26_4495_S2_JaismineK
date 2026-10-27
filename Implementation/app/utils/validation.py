@@ -96,6 +96,21 @@ def validate_notes(value: str) -> str:
     return sanitize_text(value, MAX_TEXT_LENGTH)
 
 
+def validate_hour(value) -> str | None:
+    """Return an error message for an invalid hour-of-day, else None.
+
+    None means "not recorded" and is allowed. Any recorded hour must be an
+    integer between 0 and 23.
+    """
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int):
+        return "Hour must be a whole number between 0 and 23."
+    if value < 0 or value > 23:
+        return "Hour must be between 0 and 23."
+    return None
+
+
 def validate_incident_record(record: dict) -> tuple[bool, dict]:
     """Validate a full incident submission.
 
@@ -123,6 +138,11 @@ def validate_incident_record(record: dict) -> tuple[bool, dict]:
     location_error, _ = validate_location(record.get("location", ""))
     if location_error:
         errors["location"] = location_error
+
+    if "hour" in record:
+        hour_error = validate_hour(record.get("hour"))
+        if hour_error:
+            errors["hour"] = hour_error
 
     if "notes" in record:
         validate_notes(record["notes"])
