@@ -50,7 +50,7 @@
 | Oct 26, 2026 | 0.5 | Walked through the map page from top to bottom with the demo in mind and updated the demo cheat sheet |
 | Oct 27, 2026 | 0.5 | Recorded the screen video of the app for the mid-course demo |
 | Oct 27, 2026 | 1.0 | Wrote the video script and split it into two halves - mine for the data and analysis, Shashank's for the security side |
-| Oct 27, 2026 | 1.0 | Worked on the voiceover for the video - tested the computer voice, and adjusted the pacing and timing to match the screen |
-| Oct 28, 2026 | 1.0 | Rewrote the voiceover script with clearer explanations in formal language |
+| Oct 27, 2026 | 1.0 | Recorded the video |
+| Oct 28, 2026 | 0.5 | Finalized the demo video with my narration and checked it plays correctly |
 | Oct 28, 2026 | 0.5 | Prepared a spoken summary of my part of the project to present to the instructor |
 | Oct 28, 2026 | 0.5 | Final preparation for the mid-course demonstration - went through the whole app flow and checked every page |
