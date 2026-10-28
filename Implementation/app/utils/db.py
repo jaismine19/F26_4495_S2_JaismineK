@@ -29,17 +29,34 @@ CREATE TABLE IF NOT EXISTS incidents (
 """
 
 
+# Columns added after the original schema; used to upgrade databases
+# created by older code (CREATE TABLE IF NOT EXISTS alone will not).
+COLUMN_MIGRATIONS = {
+    "hour": "INTEGER",
+    "created_role": "TEXT NOT NULL DEFAULT ''",
+}
+
+
 def get_connection() -> sqlite3.Connection:
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
 
+def _migrate(conn: sqlite3.Connection) -> None:
+    """Add any missing columns to databases created by older code."""
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(incidents)")}
+    for column, decl in COLUMN_MIGRATIONS.items():
+        if column not in existing:
+            conn.execute(f"ALTER TABLE incidents ADD COLUMN {column} {decl}")
+
+
 def init_db() -> None:
-    """Create the incidents table if it does not exist."""
+    """Create the incidents table if needed and upgrade old schemas."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with get_connection() as conn:
         conn.execute(SCHEMA)
+        _migrate(conn)
 
 
 def insert_incident(record: dict, created_by: str, created_role: str = "") -> int:
