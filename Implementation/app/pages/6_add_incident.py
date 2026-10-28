@@ -81,6 +81,22 @@ if not has_permission(user, "add_incident"):
     st.error("Your role is not allowed to add incidents.")
     st.stop()
 
+if has_permission(user, "view_audit"):
+    st.info(
+        "Your role (Administrator) can add incidents, see all entered "
+        "records, and view the Audit Log page."
+    )
+elif has_permission(user, "view_all"):
+    st.info(
+        "Your role (Analyst) can add incidents and see all entered records, "
+        "but cannot view the Audit Log."
+    )
+else:
+    st.info(
+        "Your role (Data Entry) can add incidents but can only see the "
+        "records they entered themselves."
+    )
+
 # ------------------------------------------------------------------- form
 st.markdown("### New incident form")
 
@@ -135,12 +151,16 @@ if st.button("Submit incident"):
 # ------------------------------------------------- user-entered records list
 st.markdown("### Prototype entries (user-entered, separate from VPD data)")
 st.metric("Total user-entered incidents", db.count_incidents())
-if has_permission(user, "view_audit"):
+if has_permission(user, "view_all"):
     entries = db.fetch_incidents(limit=20)
-    st.caption("You are an Administrator and can see all entered records.")
+    st.caption(
+        f"Your role ({user['role']}) can see all entered records from every user."
+    )
 else:
     entries = db.fetch_incidents(limit=20, created_by=user["username"])
-    st.caption("You can see only the records you entered.")
+    st.caption(
+        f"Your role ({user['role']}) can see only the records you entered."
+    )
 if not entries:
     st.caption("No prototype entries yet. Submit the form above to create one.")
 else:

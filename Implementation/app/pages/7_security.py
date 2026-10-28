@@ -38,6 +38,21 @@ for name, status, done in controls:
     icon = ":white_check_mark:" if done else ":construction:"
     st.markdown(f"{icon} **{name}** - {status}")
 
+st.markdown("### Role permissions (RBAC matrix)")
+
+st.markdown(
+    "| Permission | Administrator | Analyst | Data Entry |\n"
+    "|---|---|---|---|\n"
+    "| Add incident | Yes | Yes | Yes |\n"
+    "| See all entered records | Yes | Yes | No (own only) |\n"
+    "| View audit log | Yes | No | No |"
+)
+
+st.caption(
+    "Try it live on the Add Incident page: log in as `analyst` to see all "
+    "records, then as `entry` to see only your own."
+)
+
 st.markdown("### Demo credentials")
 st.code(
     "admin  / demo_admin_123      (Administrator)\n"
