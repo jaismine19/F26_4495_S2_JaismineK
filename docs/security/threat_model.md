@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.5 - October 26, 2026
+**Status:** Draft v0.5 - October 29, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -140,4 +140,4 @@ Trust boundaries:
 | Oct 11, 2026 | 0.2 | Shashank Chaudhary | Control statuses updated for implemented auth/RBAC/audit/login-limiting; added login-attempt-limiting control; reflected prototype audit log design |
 | Oct 15, 2026 | 0.3 | Shashank Chaudhary | Input validation module added (allow-lists, date checks, XSS sanitization) with 18 tests; control status updated |
 | Oct 26, 2026 | 0.4 | Shashank Chaudhary | Database & Add Incident phase started: SQLite incident store with parameterized queries, form integration with validation and audit logging, user records kept separate from public data; controls 3, 4, 8 updated |
-| Oct 26, 2026 | 0.5 | Shashank Chaudhary | Security testing phase started: pip-audit scan (41 vulns in certifi/pillow fixed, now clean) with report; RBAC matrix + password verification tests added; controls 9, 11 updated |
+| Oct 29, 2026 | 0.5 | Shashank Chaudhary | Security testing phase started: pip-audit scan (41 vulns in certifi/pillow fixed, now clean) with report; RBAC matrix + password verification tests added; controls 9, 11 updated |

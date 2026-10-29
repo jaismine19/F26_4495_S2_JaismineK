@@ -1,6 +1,6 @@
 # Dependency Scan Report
 
-**Date:** October 26, 2026
+**Date:** October 29, 2026
 **Tool:** pip-audit (Python dependency vulnerability scanner)
 **Scope:** All Python packages in the project environment (pandas, numpy,
 matplotlib, plotly, streamlit, pytest, certifi, scipy, folium,
