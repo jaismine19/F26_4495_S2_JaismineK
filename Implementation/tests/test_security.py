@@ -54,3 +54,56 @@ class TestLoginAttempts:
             auth.record_failed_attempt("attacker")
         auth.reset_attempts("attacker")
         assert not auth.is_locked_out("attacker")
+
+
+class TestRoleBasedAccess:
+    def test_permission_matrix(self):
+        admin = auth.ROLE_PERMISSIONS["Administrator"]
+        analyst = auth.ROLE_PERMISSIONS["Analyst"]
+        entry = auth.ROLE_PERMISSIONS["Data Entry"]
+
+        assert "view_audit" in admin
+        assert "view_audit" not in analyst
+        assert "view_audit" not in entry
+
+        assert "view_all" in analyst
+        assert "view_all" not in entry
+
+        assert "add_incident" in admin
+        assert "add_incident" in analyst
+        assert "add_incident" in entry
+
+    def test_has_permission_admin(self):
+        user = {"username": "admin", "role": "Administrator",
+                "permissions": auth.ROLE_PERMISSIONS["Administrator"]}
+        assert auth.has_permission(user, "view_audit")
+        assert auth.has_permission(user, "add_incident")
+
+    def test_has_permission_entry_limited(self):
+        user = {"username": "entry", "role": "Data Entry",
+                "permissions": auth.ROLE_PERMISSIONS["Data Entry"]}
+        assert auth.has_permission(user, "add_incident")
+        assert not auth.has_permission(user, "view_audit")
+        assert not auth.has_permission(user, "view_all")
+
+    def test_has_permission_anonymous(self):
+        assert not auth.has_permission(None, "add_incident")
+        assert not auth.has_permission(None, "view_audit")
+
+
+class TestPasswordVerification:
+    def test_correct_password_authenticates(self):
+        user = auth.authenticate("admin", "demo_admin_123")
+        assert user is not None
+        assert user["username"] == "admin"
+        assert user["role"] == "Administrator"
+        assert "password" not in user
+
+    def test_wrong_password_rejected(self):
+        assert auth.authenticate("admin", "wrong_password") is None
+
+    def test_unknown_user_rejected(self):
+        assert auth.authenticate("nobody", "demo_admin_123") is None
+
+    def test_username_case_insensitive_login(self):
+        assert auth.authenticate("ADMIN", "demo_admin_123") is not None

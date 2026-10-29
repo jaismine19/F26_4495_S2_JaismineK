@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.4 - October 26, 2026
+**Status:** Draft v0.5 - October 26, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -115,9 +115,9 @@ Trust boundaries:
 | 6 | Session security (regenerate on login, secure config) | High | Partial - Streamlit session state; hardening planned |
 | 7 | Login attempt limiting | High | Implemented (prototype) - 5 failures per 60s lockout (`record_failed_attempt`/`is_locked_out`) |
 | 8 | Data minimization & coordinate generalization | Medium | Partially implemented - user-entered incidents stored in a separate SQLite DB (`data/prototype.db`) with block-level locations only; map generalization later |
-| 9 | Dependency scanning (pip-audit) | Medium | Planned (testing phase) |
+| 9 | Dependency scanning (pip-audit) | Medium | Implemented - ran pip-audit (Oct 26): found 41 vulnerabilities in certifi + pillow, upgraded to patched versions, re-scan clean (see `docs/security/dependency_scan_report.md`) |
 | 10 | Secrets management (no keys in repo) | High | In place - `.gitignore`, no credentials committed |
-| 11 | Functional + security test checklist | Medium | In progress - 6 security unit tests added (`tests/test_security.py`) |
+| 11 | Functional + security test checklist | Medium | In progress - 14 security tests added (`tests/test_security.py`: audit log, lockout, RBAC matrix, password verification) |
 
 ## 6. Security Testing Plan (for later phases)
 
@@ -140,3 +140,4 @@ Trust boundaries:
 | Oct 11, 2026 | 0.2 | Shashank Chaudhary | Control statuses updated for implemented auth/RBAC/audit/login-limiting; added login-attempt-limiting control; reflected prototype audit log design |
 | Oct 15, 2026 | 0.3 | Shashank Chaudhary | Input validation module added (allow-lists, date checks, XSS sanitization) with 18 tests; control status updated |
 | Oct 26, 2026 | 0.4 | Shashank Chaudhary | Database & Add Incident phase started: SQLite incident store with parameterized queries, form integration with validation and audit logging, user records kept separate from public data; controls 3, 4, 8 updated |
+| Oct 26, 2026 | 0.5 | Shashank Chaudhary | Security testing phase started: pip-audit scan (41 vulns in certifi/pillow fixed, now clean) with report; RBAC matrix + password verification tests added; controls 9, 11 updated |

@@ -6,7 +6,8 @@ matplotlib
 plotly
 streamlit
 pytest
-certifi
+certifi>=2026.10.23
+pillow>=13.0.0
 scipy
 folium
 streamlit-folium
