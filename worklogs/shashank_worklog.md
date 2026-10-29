@@ -27,4 +27,4 @@
 | Oct 25, 2026 | 0.5 | Docs: threat model v0.4, Security page control statuses, README updates |
 | Oct 28, 2026 | 1.0 | RBAC demo: made the Analyst vs Data Entry difference visible (Analyst sees all entered records, Data Entry sees only their own) with role info banners and an RBAC matrix on the Security page |
 | Oct 28, 2026 | 1.5 | Dependency scan: ran pip-audit - found 41 known vulnerabilities in certifi and pillow; upgraded both to patched versions and pinned minimum versions in requirements.txt; re-scan reports 0 vulnerabilities; wrote docs/security/dependency_scan_report.md |
-| Oct 29, 2026 | 1.0 | Security testing: added RBAC permission-matrix tests and password-verification tests to tests/test_security.py; full suite now 81 tests passing; threat model v0.5 and Security page statuses updated |
+| Oct 29, 2026 | 1.5 | Security testing: added RBAC permission-matrix tests and password-verification tests to tests/test_security.py; full suite now 81 tests passing; threat model v0.5 and Security page statuses updated |
