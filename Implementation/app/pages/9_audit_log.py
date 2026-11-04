@@ -6,7 +6,14 @@ Only users with the view_audit permission (Administrator role) can read it.
 import pandas as pd
 import streamlit as st
 
-from app.utils.auth import authenticate, has_permission, read_audit_log
+from app.utils.auth import (
+    authenticate,
+    create_session,
+    has_permission,
+    is_session_valid,
+    read_audit_log,
+    refresh_session,
+)
 
 st.title("Audit Log")
 st.markdown(
@@ -28,11 +35,17 @@ if st.session_state.user is None:
         if user is None:
             st.error("Invalid username or password.")
         else:
-            st.session_state.user = user
+            st.session_state.user = create_session(user)
             st.rerun()
     st.stop()
 
 user = st.session_state.user
+if not is_session_valid(user):
+    st.session_state.user = None
+    st.warning("Your session has expired. Please log in again.")
+    st.stop()
+
+refresh_session(user)
 st.success(f"Logged in as **{user['username']}** (role: {user['role']})")
 
 if not has_permission(user, "view_audit"):

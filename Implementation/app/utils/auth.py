@@ -154,3 +154,43 @@ def is_locked_out(username: str) -> bool:
 def reset_attempts(username: str) -> None:
     """Clear failed-attempt history for a username (after a successful login)."""
     _attempts.pop(username.strip().lower(), None)
+
+
+# ------------------------------------------------------------ session handling
+# Prototype session controls (see docs/security/threat_model.md):
+# - A fresh, random session id is issued on every login (guards against
+#   session-fixation attacks).
+# - Sessions expire after a fixed TTL and are refreshed on activity.
+# - Logout drops the session entirely.
+
+SESSION_TTL_SECONDS = 30 * 60  # 30 minutes
+
+
+def create_session(user: dict) -> dict:
+    """Wrap an authenticated user in a fresh session with a random id."""
+    now = time.time()
+    return {
+        "username": user["username"],
+        "role": user["role"],
+        "permissions": user.get("permissions", set()),
+        "session_id": secrets.token_urlsafe(32),
+        "issued_at": now,
+        "expires_at": now + SESSION_TTL_SECONDS,
+    }
+
+
+def is_session_valid(session: dict | None, now: float | None = None) -> bool:
+    """True if the session exists, has an id, and has not expired."""
+    if not isinstance(session, dict):
+        return False
+    if "session_id" not in session or "expires_at" not in session:
+        return False
+    now = time.time() if now is None else now
+    return session["expires_at"] > now
+
+
+def refresh_session(session: dict, now: float | None = None) -> dict:
+    """Extend a valid session's expiry (sliding window)."""
+    now = time.time() if now is None else now
+    session["expires_at"] = now + SESSION_TTL_SECONDS
+    return session

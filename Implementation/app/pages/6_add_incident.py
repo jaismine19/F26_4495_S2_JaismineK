@@ -12,10 +12,13 @@ import streamlit as st
 from app.utils import db
 from app.utils.auth import (
     authenticate,
+    create_session,
     has_permission,
     is_locked_out,
+    is_session_valid,
     log_audit,
     record_failed_attempt,
+    refresh_session,
     reset_attempts,
 )
 from app.utils.validation import (
@@ -67,12 +70,18 @@ if st.session_state.user is None:
             else:
                 reset_attempts(username)
                 log_audit(username, "login_success", "web login")
-                st.session_state.user = user
+                st.session_state.user = create_session(user)
                 st.rerun()
     st.stop()
 
 # -------------------------------------------------------------- logged in
 user = st.session_state.user
+if not is_session_valid(user):
+    st.session_state.user = None
+    st.warning("Your session has expired. Please log in again.")
+    st.stop()
+
+refresh_session(user)
 st.success(f"Logged in as **{user['username']}** (role: {user['role']})")
 if st.button("Log out"):
     do_logout()

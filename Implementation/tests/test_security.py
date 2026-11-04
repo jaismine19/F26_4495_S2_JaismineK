@@ -107,3 +107,38 @@ class TestPasswordVerification:
 
     def test_username_case_insensitive_login(self):
         assert auth.authenticate("ADMIN", "demo_admin_123") is not None
+
+
+class TestSessionHandling:
+    def make_user(self):
+        return {"username": "admin", "role": "Administrator",
+                "permissions": auth.ROLE_PERMISSIONS["Administrator"]}
+
+    def test_session_has_unique_random_id(self):
+        s1 = auth.create_session(self.make_user())
+        s2 = auth.create_session(self.make_user())
+        assert s1["session_id"] != s2["session_id"]
+        assert len(s1["session_id"]) >= 32
+
+    def test_fresh_session_is_valid(self):
+        s = auth.create_session(self.make_user())
+        assert auth.is_session_valid(s)
+
+    def test_expired_session_is_invalid(self):
+        s = auth.create_session(self.make_user())
+        assert not auth.is_session_valid(s, now=s["expires_at"] + 1)
+
+    def test_refresh_extends_expiry(self):
+        s = auth.create_session(self.make_user())
+        original_expiry = s["expires_at"]
+        later = original_expiry + 1000
+        auth.refresh_session(s, now=later)
+        assert s["expires_at"] == later + auth.SESSION_TTL_SECONDS
+
+    def test_none_or_incomplete_session_is_invalid(self):
+        assert not auth.is_session_valid(None)
+        assert not auth.is_session_valid({"username": "admin"})
+
+    def test_session_carries_permissions(self):
+        s = auth.create_session(self.make_user())
+        assert auth.has_permission(s, "view_audit")

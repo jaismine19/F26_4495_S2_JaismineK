@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.5 - October 29, 2026
+**Status:** Draft v0.6 - November 4, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -112,7 +112,7 @@ Trust boundaries:
 | 3 | Parameterized SQL queries | Critical | Implemented - all incident-store queries use parameterized statements (`app/utils/db.py`); SQL-injection tests included |
 | 4 | Input validation/encoding (XSS prevention) | High | Implemented - allow-lists for crime type/neighbourhood, date range checks, hour-of-day check, HTML/script sanitization (`app/utils/validation.py`, 18 tests); integrated into the Add Incident form |
 | 5 | Audit logging for user actions | High | Implemented (prototype) - append-only JSONL audit log (`log_audit`/`read_audit_log`); DB-backed audit table planned |
-| 6 | Session security (regenerate on login, secure config) | High | Partial - Streamlit session state; hardening planned |
+| 6 | Session security (regenerate on login, secure config) | High | Implemented (prototype) - fresh random session id per login, 30-minute sliding expiry, logout clears session (`auth.py` create_session/is_session_valid/refresh_session); full HTTPS/session config still needed for real deployment |
 | 7 | Login attempt limiting | High | Implemented (prototype) - 5 failures per 60s lockout (`record_failed_attempt`/`is_locked_out`) |
 | 8 | Data minimization & coordinate generalization | Medium | Partially implemented - user-entered incidents stored in a separate SQLite DB (`data/prototype.db`) with block-level locations only; map generalization later |
 | 9 | Dependency scanning (pip-audit) | Medium | Implemented - ran pip-audit (Oct 26): found 41 vulnerabilities in certifi + pillow, upgraded to patched versions, re-scan clean (see `docs/security/dependency_scan_report.md`) |
@@ -141,3 +141,4 @@ Trust boundaries:
 | Oct 15, 2026 | 0.3 | Shashank Chaudhary | Input validation module added (allow-lists, date checks, XSS sanitization) with 18 tests; control status updated |
 | Oct 26, 2026 | 0.4 | Shashank Chaudhary | Database & Add Incident phase started: SQLite incident store with parameterized queries, form integration with validation and audit logging, user records kept separate from public data; controls 3, 4, 8 updated |
 | Oct 29, 2026 | 0.5 | Shashank Chaudhary | Security testing phase started: pip-audit scan (41 vulns in certifi/pillow fixed, now clean) with report; RBAC matrix + password verification tests added; controls 9, 11 updated |
+| Nov 4, 2026 | 0.6 | Shashank Chaudhary | Session hardening implemented (fresh session id per login, 30-min sliding expiry, logout clears session) with 6 tests; manual OWASP-style testing log added (10 cases, all passed); controls 6, 11 updated |

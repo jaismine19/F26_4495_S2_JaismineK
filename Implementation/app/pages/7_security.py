@@ -9,7 +9,7 @@ st.markdown(
 
 st.markdown("### Threat model status")
 st.markdown(
-    "- **Threat model v0.5** (`docs/security/threat_model.md`): assets, threat "
+    "- **Threat model v0.6** (`docs/security/threat_model.md`): assets, threat "
     "actors, STRIDE analysis, OWASP Top 10 relevance, controls, and "
     "security testing plan."
 )
@@ -31,7 +31,7 @@ controls = [
     ("Parameterized SQL queries (SQLite, user records only)", "Implemented", True),
     ("User records kept separate from public data", "Implemented", True),
     ("Dependency scanning (pip-audit)", "Implemented", True),
-    ("Session security hardening", "Planned", False),
+    ("Session security hardening", "Implemented", True),
 ]
 
 for name, status, done in controls:

@@ -68,8 +68,8 @@ streamlit run Implementation/app/Home.py
 | Analytics | pandas, numpy, scipy (chi-square, k-means) |
 | ML | Moving-average + seasonal-naive baseline forecast with MAE/RMSE |
 | Data | VPD GeoDASH CSV pipeline (pandas) + SQLite (user-entered records) |
-| Security | PBKDF2 password hashing, RBAC, login lockout, append-only audit log, input validation/sanitization, parameterized SQL, pip-audit dependency scanning |
-| Testing | pytest (81 tests: pipeline, security, stats, geo, clustering, forecast, db) |
+| Security | PBKDF2 password hashing, RBAC, login lockout, session hardening (fresh id + expiry), append-only audit log, input validation/sanitization, parameterized SQL, pip-audit dependency scanning |
+| Testing | pytest (87 tests: pipeline, security, stats, geo, clustering, forecast, db) |
 
 ### Completed so far
 
@@ -101,11 +101,15 @@ streamlit run Implementation/app/Home.py
 - Temporal & pandemic analysis notebook (`notebooks/02_temporal_and_pandemic_analysis.ipynb`):
   crime-type hour patterns, redacted-timestamp finding, COVID comparison,
   seasonality and neighbourhood-change hypotheses
-- Test suite: 81 tests passing (pipeline, security, stats, geo, clustering,
+- Test suite: 87 tests passing (pipeline, security, stats, geo, clustering,
   forecast, db) - run with `pytest Implementation/tests/ -v`
-- Dependency scan: pip-audit run (Oct 26) - 41 vulnerabilities in certifi +
+- Dependency scan: pip-audit run (Oct 29) - 41 vulnerabilities in certifi +
   pillow found and fixed; re-scan clean (see
   `docs/security/dependency_scan_report.md`)
+- Session hardening: fresh random session id per login, 30-minute sliding
+  expiry, logout clears the session (`app/utils/auth.py`)
+- Manual security testing: 10 OWASP-style attack cases tested and documented
+  (see `docs/security/security_testing_log.md`)
 
 ### Key data quality findings
 
