@@ -20,8 +20,9 @@ st.markdown(
     "standardization, zero-coordinate flagging, datetime/day-of-week/season "
     "features. 928,362 -> 893,851 rows.\n"
     "4. Analysis: chi-square tests (scipy), k-means neighbourhood clustering "
-    "(scipy), and moving-average / same-as-last-year baseline forecasts with "
-    "MAE/RMSE evaluation.\n"
+    "(scipy), moving-average / same-as-last-year baseline forecasts with "
+    "MAE/RMSE evaluation, and crime-type classification (scikit-learn) with "
+    "a time-aware split: trained on 2003-2024, tested on 2025-2026.\n"
     "5. Geospatial: neighbourhood-level aggregation (median in-bounds UTM "
     "coordinates converted to latitude/longitude); no raw incident points "
     "are ever plotted.\n"
@@ -36,11 +37,12 @@ st.markdown(
     "- **UI:** Streamlit (multipage)\n"
     "- **Charts:** Plotly\n"
     "- **Maps:** Folium (Leaflet) on ESRI World Street Map tiles\n"
-    "- **Analytics/ML:** pandas, numpy, scipy (chi-square, k-means)\n"
+    "- **Analytics/ML:** pandas, numpy, scipy (chi-square, k-means), "
+    "scikit-learn (Logistic Regression, Decision Tree, Random Forest, KNN)\n"
     "- **Storage:** SQLite (user records only; VPD data stays read-only)\n"
     "- **Security:** PBKDF2 hashing, RBAC, login lockout, audit log, "
     "input validation, parameterized SQL\n"
-    "- **Testing:** pytest (62 tests)"
+    "- **Testing:** pytest (95 tests)"
 )
 
 st.markdown("### Limitations")
@@ -53,6 +55,11 @@ st.markdown(
     "- **Baseline models only**: the forecast is a moving average; it is "
     "measured honestly against the past, not presented as a prediction of "
     "future crime.\n"
+    "- **Classification limits**: classification models train on a balanced "
+    "sample of 150,000 past incidents for speed (rare crime types are kept), "
+    "and K-Nearest Neighbours uses a smaller 25,000 reference set; accuracy "
+    "is modest and reported as such, with mix-ups mostly between similar "
+    "property types.\n"
     "- **Prototype scope**: this app is a research prototype, not an official "
     "crime-reporting or policing-decision system."
 )

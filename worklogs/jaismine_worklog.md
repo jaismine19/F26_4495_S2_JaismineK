@@ -56,3 +56,9 @@
 | Oct 28, 2026 | 0.5 | Joined my half with Shashank's half into the final demo video |
 | Oct 28, 2026 | 0.5 | Prepared a spoken summary of my part of the project to present to the instructor |
 | Oct 28, 2026 | 0.5 | Final preparation for the mid-course demonstration - went through the whole app flow and checked every page |
+| Nov 10, 2026 | 0.5 | Installed the scikit-learn tool and added it to the project's tool list |
+| Nov 10, 2026 | 2.5 | Built the crime-type guessing experiment: four models (logistic regression, decision tree, random forest, nearest neighbours) that try to tell crime types apart from time and place; trained on years up to 2024 and tested on 2025-2026 so the test is honest; compared time-only against time-plus-neighbourhood |
+| Nov 10, 2026 | 0.5 | Wrote 8 new tests for the classification experiment (95 tests passing in total) |
+| Nov 10, 2026 | 1.5 | Rebuilt the Machine Learning page with two tabs: the existing forecast and the new classification results with a model comparison table and a confusion chart |
+| Nov 10, 2026 | 0.5 | Ran the full experiment and wrote plain-English explanations of the results (best model, most common mix-ups) into the page |
+| Nov 10, 2026 | 0.5 | Updated the README and the Methodology page to describe the new classification work and its limits |

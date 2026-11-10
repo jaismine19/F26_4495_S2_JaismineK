@@ -9,5 +9,6 @@ pytest
 certifi>=2026.10.23
 pillow>=13.0.0
 scipy
+scikit-learn
 folium
 streamlit-folium

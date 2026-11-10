@@ -55,8 +55,9 @@ streamlit run Implementation/app/Home.py
 | Sep 29-Oct 6: Data acquisition | Complete |
 | Oct 7-12: Initial implementation | Complete |
 | Oct 13-20: Analytics & security | Complete |
-| Oct 21-28: Mid-course prototype | In progress |
-| Oct 29-Nov 9: Database & Add Incident | In progress (pulled forward) |
+| Oct 21-28: Mid-course prototype | Complete |
+| Oct 29-Nov 9: Database & Add Incident | Complete (pulled forward) |
+| Nov 10-18: Testing | In progress |
 
 ### Tech stack
 
@@ -66,21 +67,22 @@ streamlit run Implementation/app/Home.py
 | Charts | Plotly (line/bar/heatmap) |
 | Maps | Folium (Leaflet) on ESRI World Street Map tiles |
 | Analytics | pandas, numpy, scipy (chi-square, k-means) |
-| ML | Moving-average + seasonal-naive baseline forecast with MAE/RMSE |
+| ML | Scikit-learn classification (Logistic Regression, Decision Tree, Random Forest, KNN vs most-common baseline; time-aware split; temporal vs temporal+geo feature experiments) + moving-average/seasonal-naive baseline forecast with MAE/RMSE |
 | Data | VPD GeoDASH CSV pipeline (pandas) + SQLite (user-entered records) |
 | Security | PBKDF2 password hashing, RBAC, login lockout, session hardening (fresh id + expiry), append-only audit log, input validation/sanitization, parameterized SQL, pip-audit dependency scanning |
-| Testing | pytest (87 tests: pipeline, security, stats, geo, clustering, forecast, db) |
+| Testing | pytest (95 tests: pipeline, security, stats, geo, clustering, forecast, classification, db) |
 
 ### Completed so far
 
 - Reproducible Python environment (`requirements.txt`): pandas, numpy,
-  matplotlib, plotly, streamlit, pytest, certifi, scipy, folium, streamlit-folium
+  matplotlib, plotly, streamlit, pytest, certifi, scipy, scikit-learn,
+  folium, streamlit-folium
 - VPD crime dataset downloaded (all neighbourhoods, all years: 928,362 rows
   as of the Oct 4, 2026 source update)
 - Initial data quality inspection (see `data/processed/data_quality_summary.txt`)
 - Data cleaning pipeline: 928,362 -> 893,851 rows (see `data/processed/cleaning_log.txt`)
 - Dataset documentation (`docs/research/dataset_documentation.md`)
-- Cybersecurity threat model v0.4 (`docs/security/threat_model.md`)
+- Cybersecurity threat model v0.6 (`docs/security/threat_model.md`)
 - Privacy review & data protection requirements (`docs/security/privacy_and_data_protection.md`)
 - Reproducible download, inspection, and cleaning scripts (`Implementation/scripts/`)
 - Streamlit app: Overview, Temporal Analysis, Statistical Analysis, Crime Map,
@@ -95,14 +97,19 @@ streamlit run Implementation/app/Home.py
   with plain-English interpretations
 - Machine Learning: honest 12-month forecast with moving-average and
   same-as-last-year baselines, MAE/RMSE evaluation
+- Machine Learning: crime-type classification experiments - Logistic
+  Regression, Decision Tree, Random Forest, and KNN against a most-common-type
+  baseline; time-aware split (train <= 2024, test 2025-2026); temporal vs
+  temporal+neighbourhood feature experiments (H3); confusion matrix and
+  most-common mix-ups error analysis (`app/utils/classification.py`)
 - Temporal Analysis page: filters plus hour-of-day, day-of-week, month,
   season charts, year x month heatmap, and automatic insights
 - Exploratory data analysis notebook (`notebooks/01_exploratory_analysis.ipynb`)
 - Temporal & pandemic analysis notebook (`notebooks/02_temporal_and_pandemic_analysis.ipynb`):
   crime-type hour patterns, redacted-timestamp finding, COVID comparison,
   seasonality and neighbourhood-change hypotheses
-- Test suite: 87 tests passing (pipeline, security, stats, geo, clustering,
-  forecast, db) - run with `pytest Implementation/tests/ -v`
+- Test suite: 95 tests passing (pipeline, security, stats, geo, clustering,
+  forecast, classification, db) - run with `pytest Implementation/tests/ -v`
 - Dependency scan: pip-audit run (Oct 29) - 41 vulnerabilities in certifi +
   pillow found and fixed; re-scan clean (see
   `docs/security/dependency_scan_report.md`)
