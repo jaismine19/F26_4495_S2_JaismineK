@@ -36,5 +36,4 @@
 | Nov 10, 2026 | 0.5 | Threat model: completed the Security Controls Summary table - refreshed statuses, dependency-scan date, and test-count references |
 | Nov 13, 2026 | 1.5 | Threat model: added a Security Testing Results section (87 automated tests, 10 manual OWASP cases, pip-audit clean) and finalized the document as v1.0 |
 | Nov 13, 2026 | 0.25 | Security page: updated it to reference the final threat model v1.0 |
-| Nov 15, 2026 | 1.0 | Dependency scan: reinstalled pip-audit after the laptop update and re-ran the scan - 0 known vulnerabilities; updated docs/security/dependency_scan_report.md with the final re-scan section |
-| Nov 16, 2026 | 1.0 | Final checks before submission: re-ran the full test suite (87 passing); resolved the threat model section 7 open questions (deployment target local, Add Incident behind login only); updated the README progress table with the final project phases |
+| Nov 15, 2026 | 2.0 | Dependency scan and final checks: reinstalled pip-audit after the laptop update and re-ran the scan - 0 known vulnerabilities; re-ran the full test suite (87 passing); resolved the threat model section 7 open questions (deployment target local, Add Incident behind login only); updated the dependency scan report and the README progress table |
