@@ -9,9 +9,9 @@ st.markdown(
 
 st.markdown("### Threat model status")
 st.markdown(
-    "- **Threat model v0.6** (`docs/security/threat_model.md`): assets, threat "
-    "actors, STRIDE analysis, OWASP Top 10 relevance, controls, and "
-    "security testing plan."
+    "- **Threat model v1.0 (final)** (`docs/security/threat_model.md`): assets, "
+    "threat actors, STRIDE analysis, OWASP Top 10 relevance, controls, and "
+    "security testing results."
 )
 st.markdown(
     "- **Privacy review v0.1** (`docs/security/privacy_and_data_protection.md`): "

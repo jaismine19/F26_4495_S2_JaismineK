@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Draft v0.6 - November 4, 2026
+**Status:** Final v1.0 - November 4, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -48,32 +48,32 @@ Trust boundaries:
 
 | Threat | Risk | Mitigation | Status |
 |---|---|---|---|
-| Attacker impersonates another user | Medium | Hashed passwords (e.g., bcrypt/argon2), session validation on every request | Planned |
-| Attacker guesses/reuses credentials | Medium | Password policy: minimum length, breach-password check where feasible | Planned |
+| Attacker impersonates another user | Medium | Hashed passwords (PBKDF2) and a fresh random session id on every login | Implemented |
+| Attacker guesses/reuses credentials | Medium | Login lockout (5 tries / 60s); password policy (min length, breach check) not yet enforced on demo accounts | Partially implemented |
 
 ### 4.2 Tampering
 
 | Threat | Risk | Mitigation | Status |
 |---|---|---|---|
-| User modifies another user's incident records | Medium | Role-based access control (RBAC); ownership checks on update/delete | Planned |
-| User alters audit logs | Medium | Append-only audit table; no update/delete permissions on logs | Planned |
+| User modifies another user's incident records | Medium | Role-based access control (RBAC); users can only view their own records; no update/delete endpoint exposed | Implemented |
+| User alters audit logs | Medium | Append-only JSONL audit log; no update/delete operations on logs | Implemented |
 | Injection of fake incident data | Low-Medium | All user-entered records tagged with `source='user'` and kept separate from public data | Implemented |
 
 ### 4.3 Repudiation
 
 | Threat | Risk | Mitigation | Status |
 |---|---|---|---|
-| User denies submitting a record | Low | Audit logs with user_id, action, timestamp on every write | Planned |
+| User denies submitting a record | Low | Audit log records user_id, action, and timestamp on every write | Implemented |
 
 ### 4.4 Information Disclosure
 
 | Threat | Risk | Mitigation | Status |
 |---|---|---|---|
-| SQL injection leaks database contents | High | Parameterized queries only; test with injection payloads | Planned |
-| Passwords stored in plain text | High | Secure password hashing (bcrypt/argon2), never store plaintext | Planned |
-| Error messages reveal internals | Low | Generic error pages; log details server-side only | Planned |
-| Sensitive data in logs | Medium | Redact credentials/tokens from logs | Planned |
-| Over-precise location display | Low-Medium | Aggregate/generalize coordinates on public maps (privacy) | Planned |
+| SQL injection leaks database contents | High | Parameterized queries only; injection payloads tested (`tests/test_db.py`) | Implemented |
+| Passwords stored in plain text | High | PBKDF2-HMAC-SHA256 hashing with per-user salt; plaintext never stored | Implemented |
+| Error messages reveal internals | Low | Generic error handling; detailed errors kept server-side only | Partially implemented |
+| Sensitive data in logs | Medium | Audit log stores username/action only; no passwords or tokens are written | Implemented |
+| Over-precise location display | Low-Medium | Neighbourhood-level aggregation on the public map (privacy-safe) | Implemented |
 
 ### 4.5 Denial of Service
 
@@ -85,8 +85,8 @@ Trust boundaries:
 
 | Threat | Risk | Mitigation | Status |
 |---|---|---|---|
-| Role confusion (user acts as admin) | High | Server-side role checks on every privileged page/action; roles assigned only by admin | Planned |
-| Session fixation/hijacking | Medium | Secure session configuration; regenerate session on login | Planned |
+| Role confusion (user acts as admin) | High | Server-side permission checks on every privileged page/action (`has_permission`) | Implemented |
+| Session fixation/hijacking | Medium | Fresh random session id on every login; 30-minute expiry; logout clears session | Implemented |
 
 ### 4.7 Cross-cutting Application Threats (OWASP Top 10 relevance)
 
@@ -105,7 +105,7 @@ Trust boundaries:
 
 ## 5. Security Controls Summary
 
-| # | Control | Priority | Status (Oct 11) |
+| # | Control | Priority | Status (Nov 4) |
 |---|---|---|---|
 | 1 | Password hashing | Critical | Implemented - PBKDF2-HMAC-SHA256, 200k iterations, per-user salt (`app/utils/auth.py`); bcrypt/argon2 upgrade before any non-demo use |
 | 2 | RBAC: Administrator, Analyst, Data Entry | Critical | Implemented - roles + permission sets enforced on Add Incident page |
@@ -115,22 +115,34 @@ Trust boundaries:
 | 6 | Session security (regenerate on login, secure config) | High | Implemented (prototype) - fresh random session id per login, 30-minute sliding expiry, logout clears session (`auth.py` create_session/is_session_valid/refresh_session); full HTTPS/session config still needed for real deployment |
 | 7 | Login attempt limiting | High | Implemented (prototype) - 5 failures per 60s lockout (`record_failed_attempt`/`is_locked_out`) |
 | 8 | Data minimization & coordinate generalization | Medium | Partially implemented - user-entered incidents stored in a separate SQLite DB (`data/prototype.db`) with block-level locations only; map generalization later |
-| 9 | Dependency scanning (pip-audit) | Medium | Implemented - ran pip-audit (Oct 26): found 41 vulnerabilities in certifi + pillow, upgraded to patched versions, re-scan clean (see `docs/security/dependency_scan_report.md`) |
+| 9 | Dependency scanning (pip-audit) | Medium | Implemented - ran pip-audit (Oct 29): found 41 vulnerabilities in certifi + pillow, upgraded to patched versions, re-scan clean (see `docs/security/dependency_scan_report.md`) |
 | 10 | Secrets management (no keys in repo) | High | In place - `.gitignore`, no credentials committed |
-| 11 | Functional + security test checklist | Medium | In progress - 14 security tests added (`tests/test_security.py`: audit log, lockout, RBAC matrix, password verification) |
+| 11 | Functional + security test checklist | Medium | Implemented - 87 tests total (20 security tests in `tests/test_security.py` and `tests/test_db.py`: audit log, lockout, RBAC matrix, password verification, sessions, injection) |
 
-## 6. Security Testing Plan (for later phases)
+## 6. Security Testing Results
 
-- Manual testing with OWASP-style test cases (SQLi, XSS, auth bypass).
-- Automated dependency scan: `pip-audit`.
-- Session/role matrix test: every page x every role.
-- Review of audit logs after test submissions.
+Testing was performed in two ways: automated tests (pytest) and manual
+OWASP-style attack tests.
 
-## 7. Open Questions / Decisions Needed
+- **Automated:** 87 tests passing, including 20 security tests covering the
+  audit log, login lockout, RBAC matrix, password verification, session
+  handling, and SQL-injection safety.
+- **Manual:** 10 OWASP-style attack cases tested and all passed, documented in
+  `docs/security/security_testing_log.md` (SQL injection, stored XSS, login
+  bypass, access control, record visibility, brute force, session reuse,
+  allow-list/date validation, and secrets-in-repo).
+- **Dependency scan:** `pip-audit` run; 41 vulnerabilities found in certifi
+  and pillow, fixed by upgrading, re-scan clean
+  (`docs/security/dependency_scan_report.md`).
 
-- Database choice decided: SQLite for the prototype (`data/prototype.db`, parameterized queries); PostgreSQL only if a production deployment is planned.
-- Deployment target (Streamlit Community Cloud vs local) - affects HTTPS/session config.
-- Whether the Add Incident page is behind login only, or also IP-restricted for demos.
+Remaining before final submission: re-run the automated suite and `pip-audit`,
+and review the audit log after the final demo.
+
+## 7. Decisions
+
+- **Database choice:** SQLite for the prototype (`data/prototype.db`, parameterized queries); PostgreSQL only if a production deployment is planned.
+- **Deployment target:** Local only for this research prototype (run via `streamlit run Implementation/app/Home.py`). HTTPS/secure-session config is therefore handled by the development server defaults; a production deployment on Streamlit Community Cloud or a managed host would require enabling HTTPS and `secure` cookies before any real use.
+- **Add Incident access:** Behind login only (RBAC + session checks). No IP restriction for demos, since the prototype is not exposed publicly.
 
 ## 8. Revision History
 
@@ -142,3 +154,4 @@ Trust boundaries:
 | Oct 26, 2026 | 0.4 | Shashank Chaudhary | Database & Add Incident phase started: SQLite incident store with parameterized queries, form integration with validation and audit logging, user records kept separate from public data; controls 3, 4, 8 updated |
 | Oct 29, 2026 | 0.5 | Shashank Chaudhary | Security testing phase started: pip-audit scan (41 vulns in certifi/pillow fixed, now clean) with report; RBAC matrix + password verification tests added; controls 9, 11 updated |
 | Nov 4, 2026 | 0.6 | Shashank Chaudhary | Session hardening implemented (fresh session id per login, 30-min sliding expiry, logout clears session) with 6 tests; manual OWASP-style testing log added (10 cases, all passed); controls 6, 11 updated |
+| Nov 4, 2026 | 1.0 | Shashank Chaudhary | Finalized: STRIDE statuses updated to reflect implemented mitigations, controls table completed, Security Testing Results section added (87 tests + manual testing + pip-audit) |

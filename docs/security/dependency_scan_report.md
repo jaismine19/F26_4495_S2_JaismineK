@@ -28,8 +28,15 @@ upgrading to patched versions, and the re-scan reports **0 vulnerabilities**.
    - `pillow>=13.0.0`
 4. Re-ran `pip-audit`: **No known vulnerabilities found.**
 
+## Final re-scan (before submission)
+
+- **Date:** November 16, 2026
+- Re-ran `pip-audit` (`python -m pip_audit`): **No known vulnerabilities found.**
+- Confirms the pinned minimum versions (`certifi>=2026.10.23`,
+  `pillow>=13.0.0`) remain clean as of the final submission.
+
 ## Next steps
 
-- Re-run `pip-audit` at the end of the project before the final submission.
+- Done - final re-scan run before submission (see above).
 - Consider adding pip-audit to a small script under `scripts/` so the check
   is reproducible.

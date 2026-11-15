@@ -57,7 +57,12 @@ streamlit run Implementation/app/Home.py
 | Oct 13-20: Analytics & security | Complete |
 | Oct 21-28: Mid-course prototype | Complete |
 | Oct 29-Nov 9: Database & Add Incident | Complete (pulled forward) |
+| Nov 10-16: Progress report 2 + hardening | Complete |
 | Nov 10-18: Testing | In progress |
+| Nov 17-23: Progress report 3 | In progress |
+| Nov 24-30: Progress report 4 + final check-in | In progress |
+| Dec 1-7: Final report + implementation | In progress |
+| Dec 9: Final presentation | In progress |
 
 ### Tech stack
 
