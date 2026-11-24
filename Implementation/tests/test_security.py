@@ -109,6 +109,32 @@ class TestPasswordVerification:
         assert auth.authenticate("ADMIN", "demo_admin_123") is not None
 
 
+class TestPasswordPolicy:
+    def test_accepts_strong_password(self):
+        assert auth.validate_password_policy("CorrectHorse9") is None
+
+    def test_rejects_too_short(self):
+        err = auth.validate_password_policy("Ab1")
+        assert err is not None
+        assert "at least" in err
+
+    def test_rejects_no_digit(self):
+        assert auth.validate_password_policy("OnlyLetters") is not None
+
+    def test_rejects_no_letter(self):
+        assert auth.validate_password_policy("12345678") is not None
+
+    def test_rejects_common_password(self):
+        assert auth.validate_password_policy("password123") is not None
+
+    def test_rejects_password_matching_username(self):
+        assert auth.validate_password_policy("analyst9", "analyst9") is not None
+        assert auth.validate_password_policy("analyst9", "analyst8") is None
+
+    def test_empty_password_rejected(self):
+        assert auth.validate_password_policy("") is not None
+
+
 class TestSessionHandling:
     def make_user(self):
         return {"username": "admin", "role": "Administrator",

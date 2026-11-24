@@ -87,6 +87,48 @@ def has_permission(user: dict | None, permission: str) -> bool:
     return permission in user.get("permissions", set())
 
 
+# ------------------------------------------------------------ password policy
+# Prototype password-policy helper (see docs/security/threat_model.md control 1).
+# It defines the rules a new/changed password must satisfy. There is no
+# self-service change-password flow yet, so this is a documented, tested rule
+# set that any future account-management feature must enforce.
+
+PASSWORD_MIN_LENGTH = 8
+
+# A small deny-list of obviously weak/breached passwords. This is deliberately
+# minimal for the prototype; a real deployment would check against a full
+# breach corpus (e.g. HIBP k-anonymity API) rather than a hard-coded list.
+COMMON_PASSWORDS = frozenset(
+    {
+        "password", "password1", "password123", "12345678", "123456789",
+        "qwerty123", "letmein1", "welcome1", "admin123", "changeme",
+        "iloveyou", "monkey123", "sunshine", "abc12345", "football",
+    }
+)
+
+
+def validate_password_policy(password: str, username: str = "") -> str | None:
+    """Return a plain-English error if the password violates policy, else None.
+
+    Rules:
+    - At least PASSWORD_MIN_LENGTH characters.
+    - Contains at least one letter and one digit.
+    - Is not an obviously weak/breached password.
+    - Is not the same as the username (case-insensitive).
+    """
+    if not password or len(password) < PASSWORD_MIN_LENGTH:
+        return f"Password must be at least {PASSWORD_MIN_LENGTH} characters."
+    if not any(ch.isalpha() for ch in password):
+        return "Password must contain at least one letter."
+    if not any(ch.isdigit() for ch in password):
+        return "Password must contain at least one digit."
+    if password.lower() in COMMON_PASSWORDS:
+        return "Password is too common or has been seen in a data breach."
+    if username and password.lower() == username.strip().lower():
+        return "Password must not be the same as the username."
+    return None
+
+
 # ------------------------------------------------------------ audit logging
 # Append-only JSONL audit log with UTC timestamps.
 

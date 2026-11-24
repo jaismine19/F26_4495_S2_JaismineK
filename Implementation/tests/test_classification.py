@@ -1,9 +1,15 @@
 """Tests for the crime-type classification module (app/utils/classification.py)."""
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
 
-from app.utils import classification as clf
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
+from app.utils import classification as clf  # noqa: E402
 
 
 def tiny_df() -> pd.DataFrame:

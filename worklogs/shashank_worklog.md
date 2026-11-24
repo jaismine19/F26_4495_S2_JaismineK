@@ -37,3 +37,8 @@
 | Nov 13, 2026 | 1.5 | Threat model: added a Security Testing Results section (87 automated tests, 10 manual OWASP cases, pip-audit clean) and finalized the document as v1.0 |
 | Nov 13, 2026 | 0.25 | Security page: updated it to reference the final threat model v1.0 |
 | Nov 15, 2026 | 2.0 | Dependency scan and final checks: reinstalled pip-audit after the laptop update and re-ran the scan - 0 known vulnerabilities; re-ran the full test suite (87 passing); resolved the threat model section 7 open questions (deployment target local, Add Incident behind login only); updated the dependency scan report and the README progress table |
+| Nov 17, 2026 | 1.5 | Re-verified project state for Progress Report 3: re-ran the full pytest suite (95 passing) and pip-audit (0 known vulnerabilities) to confirm the security baseline before adding new work |
+| Nov 18, 2026 | 1.5 | Implemented a password-policy helper in app/utils/auth.py (validate_password_policy): minimum length 8, at least one letter and one digit, common/breached-password deny-list, and password-must-not-equal-username; added it as threat-model control #1 |
+| Nov 18, 2026 | 1.5 | Wrote 7 tests for the password policy (strong password accepted; too-short/no-digit/no-letter/common/matches-username/empty rejected); full suite now 102 passing |
+| Nov 21, 2026 | 1.0 | Fixed test_classification.py missing the sys.path bootstrap, so the documented `pytest Implementation/tests/` command runs from the repo root without PYTHONPATH (was erroring during collection) |
+| Nov 21, 2026 | 1.5 | Updated docs to match: threat model v1.1 (password policy, spoofing/control-1 statuses, test count 87 -> 102), README security/test entries, and the Methodology page test count |

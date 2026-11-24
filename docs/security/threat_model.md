@@ -1,7 +1,7 @@
 # Threat Model - Vancouver Urban Safety Intelligence Platform
 
 **Owner:** Shashank Chaudhary (Cybersecurity workstream)
-**Status:** Final v1.0 - November 4, 2026
+**Status:** Final v1.1 - November 21, 2026
 **Scope:** Streamlit web application, authentication system, database, and
 prototype incident-entry feature described in the project proposal.
 
@@ -49,7 +49,7 @@ Trust boundaries:
 | Threat | Risk | Mitigation | Status |
 |---|---|---|---|
 | Attacker impersonates another user | Medium | Hashed passwords (PBKDF2) and a fresh random session id on every login | Implemented |
-| Attacker guesses/reuses credentials | Medium | Login lockout (5 tries / 60s); password policy (min length, breach check) not yet enforced on demo accounts | Partially implemented |
+| Attacker guesses/reuses credentials | Medium | Login lockout (5 tries / 60s); password policy helper (min length, letter+digit, common/breached-password deny-list, no username) defined and tested in `auth.py`; not wired to a self-service change flow because the prototype has none | Partially implemented |
 
 ### 4.2 Tampering
 
@@ -107,7 +107,7 @@ Trust boundaries:
 
 | # | Control | Priority | Status (Nov 4) |
 |---|---|---|---|
-| 1 | Password hashing | Critical | Implemented - PBKDF2-HMAC-SHA256, 200k iterations, per-user salt (`app/utils/auth.py`); bcrypt/argon2 upgrade before any non-demo use |
+| 1 | Password hashing | Critical | Implemented - PBKDF2-HMAC-SHA256, 200k iterations, per-user salt (`app/utils/auth.py`); bcrypt/argon2 upgrade before any non-demo use. Password-policy helper (`validate_password_policy`: min length 8, letter+digit, common-password deny-list, no username) added and tested |
 | 2 | RBAC: Administrator, Analyst, Data Entry | Critical | Implemented - roles + permission sets enforced on Add Incident page |
 | 3 | Parameterized SQL queries | Critical | Implemented - all incident-store queries use parameterized statements (`app/utils/db.py`); SQL-injection tests included |
 | 4 | Input validation/encoding (XSS prevention) | High | Implemented - allow-lists for crime type/neighbourhood, date range checks, hour-of-day check, HTML/script sanitization (`app/utils/validation.py`, 18 tests); integrated into the Add Incident form |
@@ -117,16 +117,16 @@ Trust boundaries:
 | 8 | Data minimization & coordinate generalization | Medium | Partially implemented - user-entered incidents stored in a separate SQLite DB (`data/prototype.db`) with block-level locations only; map generalization later |
 | 9 | Dependency scanning (pip-audit) | Medium | Implemented - ran pip-audit (Oct 29): found 41 vulnerabilities in certifi + pillow, upgraded to patched versions, re-scan clean (see `docs/security/dependency_scan_report.md`) |
 | 10 | Secrets management (no keys in repo) | High | In place - `.gitignore`, no credentials committed |
-| 11 | Functional + security test checklist | Medium | Implemented - 87 tests total (20 security tests in `tests/test_security.py` and `tests/test_db.py`: audit log, lockout, RBAC matrix, password verification, sessions, injection) |
+| 11 | Functional + security test checklist | Medium | Implemented - 102 tests total (28 security tests in `tests/test_security.py` including audit log, lockout, RBAC matrix, password verification, password policy, sessions; plus SQL-injection tests in `tests/test_db.py`) |
 
 ## 6. Security Testing Results
 
 Testing was performed in two ways: automated tests (pytest) and manual
 OWASP-style attack tests.
 
-- **Automated:** 87 tests passing, including 20 security tests covering the
-  audit log, login lockout, RBAC matrix, password verification, session
-  handling, and SQL-injection safety.
+- **Automated:** 102 tests passing, including security tests covering the
+  audit log, login lockout, RBAC matrix, password verification, password
+  policy, session handling, and SQL-injection safety.
 - **Manual:** 10 OWASP-style attack cases tested and all passed, documented in
   `docs/security/security_testing_log.md` (SQL injection, stored XSS, login
   bypass, access control, record visibility, brute force, session reuse,
@@ -155,3 +155,4 @@ and review the audit log after the final demo.
 | Oct 29, 2026 | 0.5 | Shashank Chaudhary | Security testing phase started: pip-audit scan (41 vulns in certifi/pillow fixed, now clean) with report; RBAC matrix + password verification tests added; controls 9, 11 updated |
 | Nov 4, 2026 | 0.6 | Shashank Chaudhary | Session hardening implemented (fresh session id per login, 30-min sliding expiry, logout clears session) with 6 tests; manual OWASP-style testing log added (10 cases, all passed); controls 6, 11 updated |
 | Nov 4, 2026 | 1.0 | Shashank Chaudhary | Finalized: STRIDE statuses updated to reflect implemented mitigations, controls table completed, Security Testing Results section added (87 tests + manual testing + pip-audit) |
+| Nov 21, 2026 | 1.1 | Shashank Chaudhary | Added password-policy helper with tests (`auth.py`); updated spoofing/control 1 statuses; refreshed test counts (87 -> 102) and re-confirmed pip-audit clean |

@@ -41,8 +41,8 @@ st.markdown(
     "scikit-learn (Logistic Regression, Decision Tree, Random Forest, KNN)\n"
     "- **Storage:** SQLite (user records only; VPD data stays read-only)\n"
     "- **Security:** PBKDF2 hashing, RBAC, login lockout, audit log, "
-    "input validation, parameterized SQL\n"
-    "- **Testing:** pytest (95 tests)"
+    "input validation, parameterized SQL, password policy\n"
+    "- **Testing:** pytest (102 tests)"
 )
 
 st.markdown("### Limitations")

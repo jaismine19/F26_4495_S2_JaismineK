@@ -74,8 +74,8 @@ streamlit run Implementation/app/Home.py
 | Analytics | pandas, numpy, scipy (chi-square, k-means) |
 | ML | Scikit-learn classification (Logistic Regression, Decision Tree, Random Forest, KNN vs most-common baseline; time-aware split; temporal vs temporal+geo feature experiments) + moving-average/seasonal-naive baseline forecast with MAE/RMSE |
 | Data | VPD GeoDASH CSV pipeline (pandas) + SQLite (user-entered records) |
-| Security | PBKDF2 password hashing, RBAC, login lockout, session hardening (fresh id + expiry), append-only audit log, input validation/sanitization, parameterized SQL, pip-audit dependency scanning |
-| Testing | pytest (95 tests: pipeline, security, stats, geo, clustering, forecast, classification, db) |
+| Security | PBKDF2 password hashing, password policy, RBAC, login lockout, session hardening (fresh id + expiry), append-only audit log, input validation/sanitization, parameterized SQL, pip-audit dependency scanning |
+| Testing | pytest (102 tests: pipeline, security, stats, geo, clustering, forecast, classification, db) |
 
 ### Completed so far
 
@@ -113,8 +113,11 @@ streamlit run Implementation/app/Home.py
 - Temporal & pandemic analysis notebook (`notebooks/02_temporal_and_pandemic_analysis.ipynb`):
   crime-type hour patterns, redacted-timestamp finding, COVID comparison,
   seasonality and neighbourhood-change hypotheses
-- Test suite: 95 tests passing (pipeline, security, stats, geo, clustering,
+- Test suite: 102 tests passing (pipeline, security, stats, geo, clustering,
   forecast, classification, db) - run with `pytest Implementation/tests/ -v`
+- Password policy: `validate_password_policy` helper in `app/utils/auth.py`
+  (min length 8, letter + digit, common/breached-password deny-list, no
+  username) with 7 dedicated tests
 - Dependency scan: pip-audit run (Oct 29) - 41 vulnerabilities in certifi +
   pillow found and fixed; re-scan clean (see
   `docs/security/dependency_scan_report.md`)
