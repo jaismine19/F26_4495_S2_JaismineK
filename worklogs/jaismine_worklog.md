@@ -62,3 +62,9 @@
 | Nov 10, 2026 | 1.5 | Rebuilt the Machine Learning page with two tabs: the existing forecast and the new classification results with a model comparison table and a confusion chart |
 | Nov 10, 2026 | 0.5 | Ran the full experiment and wrote plain-English explanations of the results (best model, most common mix-ups) into the page |
 | Nov 10, 2026 | 0.5 | Updated the README and the Methodology page to describe the new classification work and its limits |
+| Nov 16, 2026 | 1.0 | Read through the whole project to plan the integration phase: listed what is finished and what still needs tying together before the final report |
+| Nov 17, 2026 | 1.5 | Went through the app page by page (Overview, Temporal, Statistical, Crime Map, Machine Learning) and noted anything inconsistent or unfinished |
+| Nov 18, 2026 | 2.0 | Started the integration work: updated the Methodology page so it explains the whole pipeline - data, maps, statistics, and models - in one clear flow that matches the README |
+| Nov 19, 2026 | 1.5 | Checked the analytics numbers in the app against the real dataset once more and made the Statistics and Machine Learning pages use the same test setup and the same honest wording about limits |
+| Nov 20, 2026 | 2.0 | Tied my analytics work together with Shashank's security work into one coherent story (data, app, security, testing) and refreshed the README progress table for the integration phase |
+| Nov 21, 2026 | 1.5 | Started the final report: pulled the key findings from the exploratory notebooks and the ML experiments and wrote the plain-English results summary for the analytics sections |
