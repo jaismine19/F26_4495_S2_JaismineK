@@ -31,6 +31,16 @@ df = require_data()
 if df is None:
     st.stop()
 
+live_on = st.session_state.get("include_user_incidents", False)
+included = int(df["SOURCE"].eq("user").sum()) if "SOURCE" in df.columns else 0
+if live_on:
+    st.info(
+        f"**Live-data simulation is ON:** {included:,} manually added "
+        "incident(s) are merged into this page's data. The model numbers "
+        "may barely move - a few demo records against ~894,000 public rows "
+        "is expected to have a tiny effect, and the page says so honestly."
+    )
+
 tab_forecast, tab_classify = st.tabs(["Forecast", "Crime-type classification"])
 
 # ================================================================== forecast
@@ -39,6 +49,11 @@ with tab_forecast:
         "What might monthly incidents look like over the next year? A simple, "
         "**honest** forecast - with its past accuracy measured, so you know "
         "how much to trust it."
+    )
+    st.caption(
+        f"Analyzing **{len(df):,}** incidents"
+        + (f" (including {included:,} manually added)" if live_on else "")
+        + "."
     )
 
     with st.expander("How this forecast works (in plain English)"):
@@ -166,6 +181,17 @@ with tab_classify:
         "a time-aware split, so the test uses only the future the models "
         "never saw."
     )
+    no_hour_user = (
+        int((df["SOURCE"].eq("user") & df["HOUR"].isna()).sum())
+        if "SOURCE" in df.columns else 0
+    )
+    st.caption(
+        f"Analyzing **{len(df):,}** incidents"
+        + (f" (including {included:,} manually added)" if live_on else "")
+        + (f"; {no_hour_user:,} manually added incident(s) have no recorded "
+           "hour and are left out of this experiment" if no_hour_user else "")
+        + "."
+    )
 
     with st.expander("How this experiment works (in plain English)"):
         st.markdown(
@@ -186,7 +212,12 @@ with tab_classify:
             "- **The speed limit:** for speed, models train on a random but "
             "balanced sample of 150,000 past incidents (rare crime types are "
             "kept), and K-Nearest Neighbours uses a smaller 25,000 reference "
-            "set. The test set is complete - nothing is hidden from it."
+            "set. The test set is complete - nothing is hidden from it.\n"
+            "- **Entries without a recorded hour are left out** of this "
+            "experiment, because the models use the hour feature. Manually "
+            "added incidents dated 2025-2026 only join the test set, so a "
+            "few demo records cannot visibly move the metrics - that is "
+            "expected and reported as such."
         )
 
     @st.cache_data(
