@@ -96,6 +96,12 @@ streamlit run Implementation/app/Home.py
   date, hour, location, notes) -> SQLite (parameterized queries) -> RBAC +
   audit trail -> separate user-entries display (admins see all records,
   other roles only their own)
+- Live-data simulation toggle: sidebar switch merges the manually added
+  incidents into the public dataset for every analysis page (Overview,
+  Temporal, Statistics, Crime Map, Machine Learning) so the app can
+  demonstrate how it behaves with live, changing data; the simulation is
+  clearly labelled, user rows carry SOURCE='user', and they have no
+  coordinates so the map counts them per neighbourhood without placing them
 - Crime Map: UTM-to-latlon conversion, privacy-safe neighbourhood aggregation,
   k-means crime-profile clustering, interactive folium map with hover/click
 - Statistical Analysis: chi-square tests (type x season, type x day-of-week)

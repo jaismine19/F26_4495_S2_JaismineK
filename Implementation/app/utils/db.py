@@ -84,28 +84,29 @@ def insert_incident(record: dict, created_by: str, created_role: str = "") -> in
         return int(cur.lastrowid)
 
 
-def fetch_incidents(limit: int = 100, created_by: str | None = None) -> list[dict]:
-    """Return the most recent user-entered incidents (newest first).
+def fetch_incidents(limit: int | None = 100, created_by: str | None = None) -> list[dict]:
+    """Return user-entered incidents, newest first.
 
     When created_by is given, only that user's records are returned.
+    Pass limit=None to fetch every stored record (used by the app's
+    "simulate live data" toggle).
     """
     init_db()
     columns = (
         "id, crime_type, incident_date, hour, neighbourhood, location, "
         "notes, source, created_by, created_role, created_at"
     )
+    sql = f"SELECT {columns} FROM incidents"
+    params: list = []
+    if created_by:
+        sql += " WHERE created_by = ?"
+        params.append(created_by)
+    sql += " ORDER BY id DESC"
+    if limit is not None:
+        sql += " LIMIT ?"
+        params.append(limit)
     with get_connection() as conn:
-        if created_by:
-            rows = conn.execute(
-                f"SELECT {columns} FROM incidents WHERE created_by = ? "
-                "ORDER BY id DESC LIMIT ?",
-                (created_by, limit),
-            ).fetchall()
-        else:
-            rows = conn.execute(
-                f"SELECT {columns} FROM incidents ORDER BY id DESC LIMIT ?",
-                (limit,),
-            ).fetchall()
+        rows = conn.execute(sql, tuple(params)).fetchall()
     return [dict(row) for row in rows]
 
 

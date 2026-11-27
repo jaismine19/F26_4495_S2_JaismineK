@@ -60,6 +60,11 @@ class TestInsertFetch:
             db.insert_incident(valid_record(), "entry")
         assert len(db.fetch_incidents(limit=3)) == 3
 
+    def test_fetch_all_with_no_limit(self):
+        for _ in range(5):
+            db.insert_incident(valid_record(), "entry")
+        assert len(db.fetch_incidents(limit=None)) == 5
+
 
 class TestInjectionSafety:
     def test_malicious_fields_stored_literally(self):

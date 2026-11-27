@@ -16,6 +16,27 @@ st.set_page_config(
     layout="wide",
 )
 
+with st.sidebar:
+    st.toggle(
+        "Include manually added incidents in all analyses",
+        key="include_user_incidents",
+        value=False,
+        help=(
+            "Simulates live, changing data: incidents added through the "
+            "Add Incident page are merged into the public dataset for every "
+            "page (Overview, Temporal, Statistics, Crime Map, Machine "
+            "Learning). The simulation is clearly labelled wherever it "
+            "appears. Turn it off to analyze the public data only."
+        ),
+    )
+    if st.session_state.get("include_user_incidents", False):
+        from app.utils import db
+
+        st.caption(
+            f"Live-data simulation ON - {db.count_incidents()} manually "
+            "added incident(s) are included in every analysis."
+        )
+
 pages = [
     st.Page("pages/1_overview.py", title="Overview", icon=":material/insights:"),
     st.Page("pages/2_crime_map.py", title="Crime Map", icon=":material/map:"),

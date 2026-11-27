@@ -29,7 +29,9 @@ st.markdown(
     "6. Secure entry: user-entered prototype records go through input "
     "validation and sanitization into SQLite via parameterized queries, "
     "tagged `source='user'` and kept separate from public data, with an "
-    "append-only audit log."
+    "append-only audit log. A sidebar toggle (live-data simulation) can "
+    "merge these records into the public dataset for every analysis page; "
+    "they stay tagged `source='user'` and are clearly labelled."
 )
 
 st.markdown("### Tech stack")
@@ -60,6 +62,12 @@ st.markdown(
     "and K-Nearest Neighbours uses a smaller 25,000 reference set; accuracy "
     "is modest and reported as such, with mix-ups mostly between similar "
     "property types.\n"
+    "- **Live-data simulation**: the toggle that merges manually added "
+    "incidents into the analyses demonstrates how the app would behave if "
+    "the data were live and changing. Those rows are demo entries, have no "
+    "coordinates (the map counts them per neighbourhood but cannot place "
+    "them), and are labelled as a simulation rather than presented as real "
+    "VPD records.\n"
     "- **Prototype scope**: this app is a research prototype, not an official "
     "crime-reporting or policing-decision system."
 )

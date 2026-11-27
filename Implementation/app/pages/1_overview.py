@@ -15,9 +15,23 @@ df = require_data()
 if df is None:
     st.stop()
 
+live_on = st.session_state.get("include_user_incidents", False)
+included = int(df["SOURCE"].eq("user").sum()) if "SOURCE" in df.columns else 0
+if live_on:
+    st.info(
+        f"**Live-data simulation is ON:** {included:,} manually added "
+        "incident(s) are merged into every chart and table on this page. "
+        "Turn the sidebar toggle off to analyze the public dataset only."
+    )
+
 st.markdown("### Key figures")
 c1, c2, c3, c4 = st.columns(4)
-c1.metric("Reported incidents", f"{len(df):,}")
+c1.metric(
+    "Reported incidents",
+    f"{len(df):,}",
+    help="Includes the manually added incidents when the live-data "
+    "simulation toggle is on.",
+)
 c2.metric("Years covered", f"{df['YEAR'].min()} - {df['YEAR'].max()}")
 c3.metric("Crime types", df["TYPE"].nunique())
 c4.metric("Neighbourhoods", df["NEIGHBOURHOOD"].nunique())
@@ -61,9 +75,10 @@ c1, c2 = st.columns(2)
 c1.metric("User-entered incidents", user_total)
 c2.metric(
     "Public dataset incidents",
-    f"{len(df):,}",
-    help="User-entered records are stored separately and are never mixed "
-    "into the public historical data.",
+    f"{len(df) - included:,}",
+    help="User-entered records are stored separately and are never silently "
+    "mixed into the public historical data. They appear in the analyses only "
+    "when the live-data simulation toggle is on, and are clearly labelled.",
 )
 if user_total:
     recent = db.fetch_incidents(limit=5)
